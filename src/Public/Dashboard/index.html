@@ -3,16 +3,75 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AutoShield AI Receptionist Dashboard</title>
+  <title>AutoShield AI Dashboard</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="dashboard">
-    <h1>AutoShield AI Receptionist</h1>
-    <div class="cards" id="cards-container">
-      <!-- Карточки добавляются через app.js -->
-    </div>
+  <div class="container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <h2>AutoShield AI</h2>
+      <nav>
+        <ul>
+          <li class="active">Live Call Monitor</li>
+          <li>Warranty Lookup</li>
+          <li>Call Log</li>
+        </ul>
+      </nav>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main-content">
+      <h1>Live Call Monitor</h1>
+      <div class="kpi-cards">
+        <div class="kpi-card">
+          <h3>Calls Today</h3>
+          <p>47</p>
+        </div>
+        <div class="kpi-card">
+          <h3>Routed Correctly</h3>
+          <p>94%</p>
+        </div>
+        <div class="kpi-card">
+          <h3>Avg Handle Time</h3>
+          <p>1m 42s</p>
+        </div>
+        <div class="kpi-card warning">
+          <h3>Sent to VM</h3>
+          <p>6</p>
+        </div>
+      </div>
+
+      <div class="modules">
+        <div class="module-card" onclick="alert('Incoming Call Details')">
+          <h3>Incoming Call — In Progress</h3>
+          <div class="history">
+            <p>Caller: +1 (416) 882-4491</p>
+            <p>Intent: Claim Status Inquiry</p>
+          </div>
+        </div>
+        <div class="module-card" onclick="alert('Routing Breakdown')">
+          <h3>Today's Routing Breakdown</h3>
+          <ul>
+            <li>Claims / Service: 19 calls</li>
+            <li>Sales: 14 calls</li>
+            <li>Accounting / Billing: 8 calls</li>
+            <li>Management: 4 calls</li>
+            <li>Voicemail: 6 calls</li>
+          </ul>
+        </div>
+        <div class="module-card" onclick="alert('AI Confidence Scores')">
+          <h3>AI Confidence Scores</h3>
+          <ul>
+            <li>Intent accuracy: 94%</li>
+            <li>Policy # captured correctly: 98%</li>
+            <li>Correct extension routed: 91%</li>
+          </ul>
+        </div>
+      </div>
+    </main>
   </div>
+
   <script src="app.js"></script>
 </body>
 </html>
