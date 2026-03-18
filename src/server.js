@@ -1,5 +1,6 @@
 import express from 'express';
-import { twiml as TwiML } from 'twilio';
+import pkg from 'twilio';
+const { twiml: TwiML } = pkg;
 import { handleIncomingCall, handleUserSpeech, handleRecording } from './callHandler.js';
 
 const app = express();
