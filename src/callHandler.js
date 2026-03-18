@@ -80,7 +80,6 @@ export async function handleUserSpeech(req, res) {
   }
   res.type('text/xml').send(response.toString());
 }
-
 export async function handleRecording(req, res) {
   const callSid = req.query.callSid || req.body.CallSid;
   const recordingUrl = req.body.RecordingUrl;
