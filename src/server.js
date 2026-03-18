@@ -1,31 +1,32 @@
 import express from 'express';
 import bodyParser from 'body-parser';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-import {
-  handleIncomingCall,
-  handleUserSpeech,
-  handleRecording,
-  handleWarrantyCheck,
-  handleAfter
-} from './callHandler.js';
+// Для ESM модулей: получаем __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
-app.use(bodyParser.urlencoded({ extended: false }));
+// Парсер JSON и URL-encoded данных
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-// ===== ROUTES =====
-app.post('/voice/incoming', handleIncomingCall);
-app.post('/voice/speech', handleUserSpeech);
-app.post('/voice/recording', handleRecording);
-app.post('/voice/check', handleWarrantyCheck);
-app.post('/voice/after', handleAfter);
+// Отдаём всю папку Public как статику
+app.use(express.static(path.join(__dirname, 'Public')));
 
-// ===== TEST ROUTE =====
-app.get('/', (req, res) => {
-  res.send('Server is running');
+// Чтобы /Dashboard работал без index.html
+app.get('/Dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, 'Public', 'Dashboard', 'index.html'));
 });
 
-// ===== START =====
+// Пример: другие маршруты API
+// app.use('/api', apiRouter);
+
+// Любые дополнительные обработчики ошибок или middleware можно добавить здесь
+
+// Запуск сервера
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
