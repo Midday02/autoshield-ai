@@ -2,30 +2,52 @@
 <html>
 <head>
   <title>AutoShield AI Receptionist</title>
-  <style>
-    body { font-family: Arial; background: #0f172a; color: white; padding: 20px; }
-    .card { background: #1e293b; padding: 20px; margin-bottom: 20px; border-radius: 12px; }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-  <h1>📞 AutoShield AI Receptionist</h1>
+  <div class="container">
+    <header>
+      <h1>AutoShield AI Receptionist Console</h1>
+      <p class="subheader">Live Call Monitor - Real-time AI activity</p>
+    </header>
 
-  <div class="card">
-    <h2>Status</h2>
-    <p>🟢 Online</p>
+    <section class="stats">
+      <div class="card">
+        <h3>Calls Today</h3>
+        <p id="callsToday">0</p>
+      </div>
+      <div class="card">
+        <h3>Routed Correctly</h3>
+        <p id="routedCorrectly">0%</p>
+      </div>
+      <div class="card">
+        <h3>Avg Handle Time</h3>
+        <p id="avgHandle">0m 0s</p>
+      </div>
+      <div class="card">
+        <h3>Sent to VM</h3>
+        <p id="sentVM">0</p>
+      </div>
+    </section>
+
+    <section class="live-call">
+      <h2>Incoming Call — In Progress</h2>
+      <p id="incomingCall">No active call</p>
+      <h3>Collected Data</h3>
+      <div id="collectedData"></div>
+    </section>
+
+    <section class="breakdown">
+      <h2>Today's Routing Breakdown</h2>
+      <div id="routingBreakdown"></div>
+    </section>
+
+    <section class="ai-scores">
+      <h2>AI Confidence Scores</h2>
+      <div id="aiScores"></div>
+    </section>
   </div>
 
-  <div class="card">
-    <h2>Calls Today</h2>
-    <p id="callsCount">...</p>
-  </div>
-
-  <div class="card">
-    <h2>Recent Calls</h2>
-    <div id="calls"></div>
-  </div>
-
-  <script src="/app.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
