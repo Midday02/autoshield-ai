@@ -1,4 +1,5 @@
-import { twiml as TwiML } from 'twilio';
+import pkg from 'twilio';
+const { twiml: TwiML } = pkg;
 import Groq from 'groq-sdk';
 import { lookupPolicy, logCall, updateCallLog } from './sheets.js';
 import { EXTENSIONS, GREETINGS, AFTER_HOURS_MSG } from './config.js';
