@@ -1,31 +1,21 @@
 import { google } from 'googleapis';
 
-const SHEET_ID = process.env.GOOGLE_SHEET_ID;
-const RANGE = 'Sheet1!A:J';
+// ===== CONFIG =====
+const SHEET_ID = '15kvlkxcR9pRxRI3LC_vv4LhpVbB4G23XVEFVAL1rfNs';
+const RANGE = 'Warranties!A1:Z1000';
 
-// === AUTH ===
+// ===== AUTH =====
 async function getAuth() {
   const auth = new google.auth.GoogleAuth({
-    credentials: JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT),
-    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    credentials: JSON.parse(process.env.GOOGLE_CREDENTIALS),
+    scopes: ['https://www.googleapis.com/auth/spreadsheets']
   });
 
-  return auth;
+  return await auth.getClient();
 }
 
-// === GET ALL CALLS (для dashboard) ===
-let calls = [];
-
-export async function logCall(call) {
-  calls.push(call);
-}
-
-export async function getCallLog() {
-  return calls;
-}
-
-// === LOOKUP POLICY ===
-export async function lookupPolicy(policyId) {
+// ===== GET ALL DATA =====
+async function getAllPolicies() {
   const auth = await getAuth();
   const sheets = google.sheets({ version: 'v4', auth });
 
@@ -35,33 +25,51 @@ export async function lookupPolicy(policyId) {
   });
 
   const rows = res.data.values;
-
-  if (!rows || rows.length === 0) return null;
-
   const headers = rows[0];
 
-  const data = rows.slice(1).map(row => {
+  return rows.slice(1).map(row => {
     let obj = {};
-    headers.forEach((h, i) => {
-      obj[h] = row[i];
-    });
+    headers.forEach((h, i) => obj[h] = row[i]);
     return obj;
   });
+}
 
-  const policy = data.find(
-    p => p.policy_id?.toUpperCase() === policyId.toUpperCase()
+// ===== LOOKUP BY PHONE =====
+export async function lookupPolicyByPhone(phone) {
+  const data = await getAllPolicies();
+  return data.find(p => p.phone === phone);
+}
+
+// ===== LOOKUP BY POLICY OR VIN =====
+export async function lookupPolicyByFullCheck(input) {
+  const data = await getAllPolicies();
+
+  return data.find(p =>
+    p.policy_id === input ||
+    p.vin?.endsWith(input)
   );
+}
 
-  if (!policy) return null;
+// ===== LOG CALL =====
+export async function logCall(entry) {
+  try {
+    const auth = await getAuth();
+    const sheets = google.sheets({ version: 'v4', auth });
 
-  return {
-    policy_id: policy.policy_id,
-    name: policy.customer_name,
-    phone: policy.phone,
-    vehicle: policy.vehicle,
-    vin: policy.vin,
-    status: policy.claim_status || 'No active claim',
-    coverage: `${policy.coverage_start} to ${policy.coverage_end}`,
-    plan: policy.plan_type,
-  };
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: SHEET_ID,
+      range: 'Logs!A1',
+      valueInputOption: 'RAW',
+      requestBody: {
+        values: [[
+          new Date().toISOString(),
+          entry.phone || '',
+          entry.intent || '',
+          entry.recording || ''
+        ]]
+      }
+    });
+  } catch (e) {
+    console.log('Log error:', e.message);
+  }
 }
