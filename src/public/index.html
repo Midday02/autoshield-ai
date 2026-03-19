@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>A-Protect Warranty — Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -16,11 +16,11 @@
   --amber:#f5a623;--amber-d:#251800;--amber-t:#fcd07a;
   --red:#f06060;--red-d:#220e0e;--red-t:#f9a0a0;
   --purple:#9b7ef0;--purple-d:#160f30;--purple-t:#c4aff8;
-  --gray-d:#1e1e26;--gray-t:#7878a0;
   --r:12px;--r2:8px;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;
 }
 body{font-family:var(--font);background:var(--bg);color:var(--t1);font-size:13px;display:flex;height:100vh;overflow:hidden}
 
+/* SIDEBAR — desktop only */
 .sidebar{width:210px;min-width:210px;background:var(--s1);border-right:0.5px solid var(--bd);display:flex;flex-direction:column}
 .brand{padding:16px;border-bottom:0.5px solid var(--bd);display:flex;align-items:center;gap:10px}
 .brand-icon{width:30px;height:30px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -28,9 +28,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--t1);font-size:13px
 .brand-name{font-size:13px;font-weight:600;color:var(--t1);line-height:1.2}
 .brand-sub{font-size:10px;color:var(--t3)}
 .nav{flex:1;padding:8px 0;overflow-y:auto}
-.nav-group{margin-bottom:4px}
 .nav-sec{padding:12px 14px 4px;font-size:9px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.1em}
-.nav-item{display:flex;align-items:center;gap:8px;padding:7px 14px;cursor:pointer;font-size:12px;color:var(--t2);border-left:2px solid transparent;transition:all .1s}
+.nav-item{display:flex;align-items:center;gap:8px;padding:8px 14px;cursor:pointer;font-size:12px;color:var(--t2);border-left:2px solid transparent;transition:all .1s}
 .nav-item:hover{background:var(--s2);color:var(--t1)}
 .nav-item.active{background:var(--blue-d);color:var(--blue-t);border-left-color:var(--blue);font-weight:500}
 .nav-item svg{width:13px;height:13px;flex-shrink:0}
@@ -42,8 +41,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--t1);font-size:13px
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 .live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;flex-shrink:0}
 
+/* MAIN */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.topbar{background:var(--s1);border-bottom:0.5px solid var(--bd);padding:11px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.topbar{background:var(--s1);border-bottom:0.5px solid var(--bd);padding:11px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .topbar-l h1{font-size:14px;font-weight:600}
 .topbar-l p{font-size:11px;color:var(--t3);margin-top:1px}
 .topbar-r{display:flex;align-items:center;gap:8px}
@@ -56,14 +56,16 @@ body{font-family:var(--font);background:var(--bg);color:var(--t1);font-size:13px
 .chip-gray{background:var(--s3);color:var(--t2)}
 .btn{padding:5px 11px;background:var(--s2);border:0.5px solid var(--bd2);border-radius:var(--r2);font-size:11px;cursor:pointer;font-family:var(--font);color:var(--t2);transition:all .1s}
 .btn:hover{background:var(--s3);color:var(--t1)}
+.btn-primary{background:var(--blue);color:white;border-color:var(--blue)}
+.btn-primary:hover{background:#4a7de0}
 
-.content{flex:1;padding:16px 20px;overflow-y:auto;display:flex;flex-direction:column;gap:16px}
-.page{display:none;flex-direction:column;gap:16px}
+.content{flex:1;padding:14px 16px;overflow-y:auto;display:flex;flex-direction:column;gap:14px}
+.page{display:none;flex-direction:column;gap:14px}
 .page.active{display:flex}
 
+/* METRICS */
 .metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
-.metric{background:var(--s2);border:0.5px solid var(--bd);border-radius:var(--r);padding:14px 16px;cursor:default;transition:border .1s}
-.metric:hover{border-color:var(--bd2)}
+.metric{background:var(--s2);border:0.5px solid var(--bd);border-radius:var(--r);padding:14px 16px}
 .metric-label{font-size:10px;font-weight:500;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
 .metric-value{font-size:24px;font-weight:600;line-height:1;margin-bottom:3px}
 .metric-sub{font-size:11px;color:var(--t3)}
@@ -71,56 +73,61 @@ body{font-family:var(--font);background:var(--bg);color:var(--t1);font-size:13px
 .metric-sub.warn{color:var(--amber-t)}
 
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
 
+/* CARD */
 .card{background:var(--s1);border:0.5px solid var(--bd);border-radius:var(--r);overflow:hidden}
-.card-head{padding:12px 16px;border-bottom:0.5px solid var(--bd);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.card-head{padding:12px 16px;border-bottom:0.5px solid var(--bd);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
 .card-title{font-size:12px;font-weight:600;color:var(--t1)}
 .card-body{padding:14px 16px}
-.card-body.np{padding:0}
 
+/* TABLE */
 table{width:100%;border-collapse:collapse;font-size:12px}
-th{text-align:left;padding:7px 14px;font-size:10px;font-weight:500;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;border-bottom:0.5px solid var(--bd);background:var(--s2);white-space:nowrap}
-td{padding:10px 14px;border-bottom:0.5px solid var(--bd);vertical-align:middle}
+th{text-align:left;padding:7px 12px;font-size:10px;font-weight:500;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;border-bottom:0.5px solid var(--bd);background:var(--s2);white-space:nowrap}
+td{padding:10px 12px;border-bottom:0.5px solid var(--bd);vertical-align:middle}
 tr:last-child td{border-bottom:none}
 tr.row-click{cursor:pointer;transition:background .1s}
 tr.row-click:hover td{background:var(--s2)}
 .mono{font-family:var(--mono);font-size:11px}
 .dim{color:var(--t3)}
 
-.req-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;padding:14px 16px}
-.req-card{background:var(--s2);border:0.5px solid var(--bd);border-radius:var(--r);padding:14px;cursor:pointer;transition:all .1s;position:relative}
+/* REQUEST CARDS */
+.req-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;padding:14px}
+.req-card{background:var(--s2);border:0.5px solid var(--bd);border-radius:var(--r);padding:14px;cursor:pointer;transition:all .1s}
 .req-card:hover{border-color:var(--bd2);background:var(--s3)}
+.req-card:active{transform:scale(0.99)}
 .req-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;gap:8px}
-.req-card-name{font-size:13px;font-weight:600;color:var(--t1)}
+.req-card-name{font-size:13px;font-weight:600}
 .req-card-sub{font-size:11px;color:var(--t3);margin-top:2px}
 .req-card-body{font-size:12px;color:var(--t2);line-height:1.5;margin-bottom:10px}
-.req-card-foot{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.req-card-foot{display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap}
 .req-card-meta{font-size:11px;color:var(--t3);font-family:var(--mono)}
 .req-type-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .req-type-icon svg{width:15px;height:15px}
 
+/* BARS */
 .bar-row{display:flex;flex-direction:column;gap:9px}
 .bar-item{display:flex;flex-direction:column;gap:3px}
 .bar-top{display:flex;justify-content:space-between;font-size:11px}
 .bar-track{background:var(--s3);border-radius:3px;height:5px}
 .bar-fill{height:5px;border-radius:3px;transition:width .5s ease}
 
-.search-input{padding:7px 11px;background:var(--s2);border:0.5px solid var(--bd);border-radius:var(--r2);font-size:12px;color:var(--t1);outline:none;font-family:var(--font);width:200px;transition:border .1s}
+/* FILTERS */
+.search-input{padding:7px 11px;background:var(--s2);border:0.5px solid var(--bd);border-radius:var(--r2);font-size:12px;color:var(--t1);outline:none;font-family:var(--font);width:180px;transition:border .1s}
 .search-input:focus{border-color:var(--blue)}
 .search-input::placeholder{color:var(--t3)}
-select.filter-sel{padding:6px 10px;background:var(--s2);border:0.5px solid var(--bd);border-radius:var(--r2);font-size:11px;color:var(--t2);outline:none;font-family:var(--font);cursor:pointer}
-select.filter-sel:focus{border-color:var(--blue)}
+select.filter-sel{padding:6px 8px;background:var(--s2);border:0.5px solid var(--bd);border-radius:var(--r2);font-size:11px;color:var(--t2);outline:none;font-family:var(--font);cursor:pointer}
 
+/* DETAIL PANEL */
 .detail-panel{border-top:0.5px solid var(--bd);display:none}
 .detail-panel.open{display:block}
-.detail-top{background:var(--blue-d);padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+.detail-top{background:var(--blue-d);padding:11px 14px;display:flex;align-items:center;justify-content:space-between}
 .detail-top h3{font-size:13px;font-weight:500;color:var(--blue-t)}
 .detail-close{background:rgba(255,255,255,0.1);border:none;color:var(--blue-t);width:22px;height:22px;border-radius:50%;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center}
-.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:14px 16px}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 14px}
 .detail-field label{font-size:10px;font-weight:500;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:3px}
 .detail-field span{font-size:12px;font-weight:500;color:var(--t1)}
 
+/* CRM */
 .policy-result{background:var(--s2);border-radius:var(--r);padding:14px;margin-top:12px;display:none}
 .policy-result.show{display:block}
 .policy-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
@@ -131,6 +138,7 @@ select.filter-sel:focus{border-color:var(--blue)}
 .policy-label{color:var(--t3)}
 .policy-val{font-weight:500}
 
+/* DIRECTORY */
 .dir-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:0.5px solid var(--bd)}
 .dir-item:last-child{border-bottom:none}
 .dir-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
@@ -142,6 +150,7 @@ select.filter-sel:focus{border-color:var(--blue)}
 .avail{width:6px;height:6px;border-radius:50%}
 .av-g{background:var(--green)}.av-a{background:var(--amber)}.av-r{background:var(--red)}
 
+/* ROADMAP */
 .rm-item{display:flex;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--bd)}
 .rm-item:last-child{border-bottom:none}
 .rm-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -150,52 +159,91 @@ select.filter-sel:focus{border-color:var(--blue)}
 .rm-desc{font-size:11px;color:var(--t3);line-height:1.5}
 .rm-phase{font-size:10px;font-weight:500;margin-top:3px;color:var(--t3);text-transform:uppercase;letter-spacing:.05em}
 
+/* MISC */
 .empty{text-align:center;padding:40px;color:var(--t3);font-size:12px}
 .loading{text-align:center;padding:30px;color:var(--t3);font-size:12px}
 ::-webkit-scrollbar{width:3px;height:3px}
 ::-webkit-scrollbar-thumb{background:var(--s4);border-radius:2px}
-.toast{position:fixed;bottom:20px;right:20px;background:var(--s3);color:var(--t1);border:0.5px solid var(--bd2);padding:9px 14px;border-radius:var(--r2);font-size:12px;opacity:0;transform:translateY(6px);transition:all .2s;pointer-events:none;z-index:999}
+.toast{position:fixed;bottom:70px;right:16px;background:var(--s3);color:var(--t1);border:0.5px solid var(--bd2);padding:9px 14px;border-radius:var(--r2);font-size:12px;opacity:0;transform:translateY(6px);transition:all .2s;pointer-events:none;z-index:999}
 .toast.show{opacity:1;transform:translateY(0)}
+
+/* BOTTOM NAV — mobile only */
+.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--s1);border-top:0.5px solid var(--bd);z-index:100;padding:6px 0 env(safe-area-inset-bottom,6px)}
+.bottom-nav-inner{display:flex;justify-content:space-around;align-items:center}
+.bnav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 12px;cursor:pointer;color:var(--t3);transition:color .1s;position:relative;min-width:56px}
+.bnav-item.active{color:var(--blue-t)}
+.bnav-item svg{width:20px;height:20px}
+.bnav-label{font-size:10px;font-weight:500}
+.bnav-badge{position:absolute;top:4px;right:10px;background:var(--amber);color:#000;font-size:9px;font-weight:600;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+
+/* MOBILE HEADER */
+.mobile-header{display:none;background:var(--s1);border-bottom:0.5px solid var(--bd);padding:12px 16px;align-items:center;justify-content:space-between;flex-shrink:0}
+.mobile-header-brand{display:flex;align-items:center;gap:8px}
+.mobile-header-icon{width:26px;height:26px;background:var(--blue);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.mobile-header-icon svg{width:12px;height:12px;fill:white}
+.mobile-header-name{font-size:13px;font-weight:600}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .sidebar{display:none}
+  .topbar{display:none}
+  .mobile-header{display:flex}
+  .bottom-nav{display:block}
+  .content{padding:12px 12px 80px}
+  .metrics{grid-template-columns:1fr 1fr;gap:8px}
+  .metrics .metric:last-child{grid-column:span 2}
+  .metric-value{font-size:20px}
+  .grid2{grid-template-columns:1fr}
+  .req-grid{grid-template-columns:1fr;padding:10px}
+  .search-input{width:100%}
+  .card-head{flex-direction:column;align-items:flex-start;gap:8px}
+  .card-head > div{width:100%}
+  .detail-grid{grid-template-columns:1fr}
+  table{font-size:11px}
+  th,td{padding:8px 10px}
+  .toast{bottom:80px}
+}
+@media (max-width: 480px) {
+  .metrics{grid-template-columns:1fr 1fr}
+  .metrics .metric:last-child{grid-column:span 2}
+  .topbar-r .chip:not(.chip-green){display:none}
+}
 </style>
 </head>
 <body>
+
+<!-- DESKTOP SIDEBAR -->
 <aside class="sidebar">
   <div class="brand">
     <div class="brand-icon"><svg viewBox="0 0 24 24"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.95.684l1.5 4.5a1 1 0 01-.23 1.02L9.2 10.52a11.05 11.05 0 005.28 5.28l1.316-1.296a1 1 0 011.02-.23l4.5 1.5a1 1 0 01.684.95V19a2 2 0 01-2 2h-1C9.82 21 3 14.18 3 6V5z"/></svg></div>
     <div><div class="brand-name">A-Protect Warranty</div><div class="brand-sub">AI Receptionist</div></div>
   </div>
   <nav class="nav">
-    <div class="nav-group">
-      <div class="nav-sec">Operations</div>
-      <div class="nav-item active" onclick="showPage('overview',this)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-        Overview
-      </div>
-      <div class="nav-item" onclick="showPage('requests',this)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12h6m-6 4h6M5 8h14M5 16h4"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
-        Requests
-        <span class="nav-count alert" id="nav-req-count">0</span>
-      </div>
-      <div class="nav-item" onclick="showPage('calls',this)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
-        Call Log
-        <span class="nav-count" id="nav-call-count">0</span>
-      </div>
-      <div class="nav-item" onclick="showPage('crm',this)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        Warranty Lookup
-      </div>
+    <div class="nav-sec">Operations</div>
+    <div class="nav-item active" onclick="showPage('overview',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Overview
     </div>
-    <div class="nav-group">
-      <div class="nav-sec">Setup</div>
-      <div class="nav-item" onclick="showPage('directory',this)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
-        Directory
-      </div>
-      <div class="nav-item" onclick="showPage('roadmap',this)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-        Roadmap
-      </div>
+    <div class="nav-item" onclick="showPage('requests',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M9 12h6M9 8h4"/></svg>
+      Requests<span class="nav-count alert" id="nav-req-count">0</span>
+    </div>
+    <div class="nav-item" onclick="showPage('calls',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+      Call Log<span class="nav-count" id="nav-call-count">0</span>
+    </div>
+    <div class="nav-item" onclick="showPage('crm',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      Warranty Lookup
+    </div>
+    <div class="nav-sec">Setup</div>
+    <div class="nav-item" onclick="showPage('directory',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      Directory
+    </div>
+    <div class="nav-item" onclick="showPage('roadmap',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10"/></svg>
+      Roadmap
     </div>
   </nav>
   <div class="sidebar-foot">
@@ -203,21 +251,39 @@ select.filter-sel:focus{border-color:var(--blue)}
     <div class="status-row" style="margin-top:4px;padding-left:12px">Groq · Twilio · Sheets</div>
   </div>
 </aside>
+
+<!-- MAIN -->
 <div class="main">
+
+  <!-- MOBILE HEADER -->
+  <div class="mobile-header">
+    <div class="mobile-header-brand">
+      <div class="mobile-header-icon"><svg viewBox="0 0 24 24"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.95.684l1.5 4.5a1 1 0 01-.23 1.02L9.2 10.52a11.05 11.05 0 005.28 5.28l1.316-1.296a1 1 0 011.02-.23l4.5 1.5a1 1 0 01.684.95V19a2 2 0 01-2 2h-1C9.82 21 3 14.18 3 6V5z"/></svg></div>
+      <span style="font-size:13px;font-weight:600">A-Protect</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span class="chip chip-green" style="font-size:10px"><span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--green);margin-right:4px;animation:pulse 2s infinite"></span>Online</span>
+      <span class="chip chip-gray" id="mobile-time" style="font-size:10px">—</span>
+      <button class="btn" onclick="refreshAll()" style="padding:4px 8px;font-size:11px">↻</button>
+    </div>
+  </div>
+
+  <!-- DESKTOP TOPBAR -->
   <div class="topbar">
-    <div class="topbar-l"><h1 id="page-title">Overview</h1><p id="page-sub">Live stats — auto-refreshes every 60s</p></div>
+    <div class="topbar-l"><h1 id="page-title">Overview</h1><p id="page-sub">Live stats</p></div>
     <div class="topbar-r">
-      <span class="chip chip-green"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);margin-right:5px;animation:pulse 2s infinite"></span>Online</span>
+      <span class="chip chip-green"><span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--green);margin-right:4px;animation:pulse 2s infinite"></span>Online</span>
       <span class="chip chip-gray" id="time-chip">—</span>
       <button class="btn" onclick="refreshAll()">↻ Refresh</button>
     </div>
   </div>
+
   <div class="content">
 
     <!-- OVERVIEW -->
     <div class="page active" id="page-overview">
       <div class="metrics">
-        <div class="metric"><div class="metric-label">Calls Today</div><div class="metric-value" id="m-total" style="color:var(--blue-t)">—</div><div class="metric-sub" id="m-total-sub">loading</div></div>
+        <div class="metric"><div class="metric-label">Calls Today</div><div class="metric-value" id="m-total" style="color:var(--blue-t)">—</div><div class="metric-sub">loading</div></div>
         <div class="metric"><div class="metric-label">Routed</div><div class="metric-value" id="m-routed" style="color:var(--green-t)">—</div><div class="metric-sub up">to agents</div></div>
         <div class="metric"><div class="metric-label">Accuracy</div><div class="metric-value" id="m-accuracy" style="color:var(--purple-t)">—</div><div class="metric-sub">AI routing</div></div>
         <div class="metric"><div class="metric-label">Voicemail</div><div class="metric-value" id="m-vm" style="color:var(--amber-t)">—</div><div class="metric-sub">after hours</div></div>
@@ -226,9 +292,9 @@ select.filter-sel:focus{border-color:var(--blue)}
       <div class="grid2">
         <div class="card">
           <div class="card-head"><span class="card-title">Recent Requests</span><span class="chip chip-gray" id="ov-req-count">—</span></div>
-          <div id="ov-requests" class="req-grid" style="padding:12px"></div>
+          <div id="ov-requests" class="req-grid" style="padding:10px"></div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;flex-direction:column;gap:12px">
           <div class="card">
             <div class="card-head"><span class="card-title">Routing Breakdown</span></div>
             <div class="card-body"><div class="bar-row" id="breakdown"></div></div>
@@ -241,9 +307,8 @@ select.filter-sel:focus{border-color:var(--blue)}
             <div class="card-head"><span class="card-title">System</span></div>
             <div class="card-body">
               <div style="display:flex;flex-direction:column;gap:7px;font-size:12px">
-                <div style="display:flex;justify-content:space-between"><span class="dim">Company</span><span>A-Protect Warranty</span></div>
                 <div style="display:flex;justify-content:space-between"><span class="dim">Phone</span><span class="mono">+1 (249) 421-4816</span></div>
-                <div style="display:flex;justify-content:space-between"><span class="dim">AI</span><span>Groq LLaMA 3.3 70B</span></div>
+                <div style="display:flex;justify-content:space-between"><span class="dim">AI engine</span><span>Groq LLaMA 3.3</span></div>
                 <div style="display:flex;justify-content:space-between"><span class="dim">Hours</span><span>Mon–Fri 9am–5pm ET</span></div>
                 <div style="display:flex;justify-content:space-between"><span class="dim">After hours</span><span>AI self-serve + VM</span></div>
               </div>
@@ -258,31 +323,16 @@ select.filter-sel:focus{border-color:var(--blue)}
       <div class="card">
         <div class="card-head">
           <span class="card-title">All Requests</span>
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-            <input class="search-input" id="req-search" placeholder="Search name, policy, summary..." oninput="filterRequests()">
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;width:100%">
+            <input class="search-input" id="req-search" placeholder="Search..." oninput="filterRequests()" style="flex:1;min-width:120px">
             <select class="filter-sel" id="req-type-filter" onchange="filterRequests()">
               <option value="">All types</option>
-              <option>Claim</option>
-              <option>Status Check</option>
-              <option>New Policy</option>
-              <option>Billing</option>
-              <option>Escalation</option>
-              <option>Dealer</option>
-              <option>Other</option>
+              <option>Claim</option><option>Status Check</option><option>New Policy</option>
+              <option>Billing</option><option>Escalation</option><option>Dealer</option><option>Other</option>
             </select>
             <select class="filter-sel" id="req-status-filter" onchange="filterRequests()">
               <option value="">All status</option>
-              <option>New</option>
-              <option>In Progress</option>
-              <option>Done</option>
-              <option>Escalated</option>
-            </select>
-            <select class="filter-sel" id="req-dept-filter" onchange="filterRequests()">
-              <option value="">All depts</option>
-              <option>Sales</option>
-              <option>Claims</option>
-              <option>Accounting</option>
-              <option>Management</option>
+              <option>New</option><option>In Progress</option><option>Done</option><option>Escalated</option>
             </select>
             <span class="chip chip-gray" id="req-count">0</span>
           </div>
@@ -296,8 +346,8 @@ select.filter-sel:focus{border-color:var(--blue)}
       <div class="card">
         <div class="card-head">
           <span class="card-title">Call Log</span>
-          <div style="display:flex;gap:8px;align-items:center">
-            <input class="search-input" id="call-search" placeholder="Search..." oninput="filterCalls()">
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;width:100%">
+            <input class="search-input" id="call-search" placeholder="Search..." oninput="filterCalls()" style="flex:1;min-width:120px">
             <select class="filter-sel" id="call-date-filter" onchange="filterCalls()">
               <option value="">All dates</option>
               <option value="today">Today</option>
@@ -328,9 +378,9 @@ select.filter-sel:focus{border-color:var(--blue)}
         <div class="card">
           <div class="card-head"><span class="card-title">Warranty Lookup</span></div>
           <div class="card-body">
-            <div style="display:flex;gap:8px">
-              <input class="search-input" id="policy-input" placeholder="W482031" maxlength="7" style="width:140px" onkeydown="if(event.key==='Enter')lookupCRM()">
-              <button class="btn" onclick="lookupCRM()" style="background:var(--blue);color:white;border-color:var(--blue)">Search</button>
+            <div style="display:flex;gap:8px;margin-bottom:4px">
+              <input class="search-input" id="policy-input" placeholder="W482031" maxlength="7" style="flex:1" onkeydown="if(event.key==='Enter')lookupCRM()">
+              <button class="btn btn-primary" onclick="lookupCRM()">Search</button>
             </div>
             <div id="crm-err" style="display:none;font-size:12px;color:var(--red-t);margin-top:8px"></div>
             <div class="policy-result" id="policy-result">
@@ -341,7 +391,7 @@ select.filter-sel:focus{border-color:var(--blue)}
               <div id="p-fields"></div>
             </div>
             <div style="margin-top:14px;padding-top:12px;border-top:0.5px solid var(--bd)">
-              <div style="font-size:10px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Quick access</div>
+              <div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Quick access</div>
               <div style="display:flex;flex-wrap:wrap;gap:6px">
                 <button class="btn" onclick="setPolicy('W482031')">W482031</button>
                 <button class="btn" onclick="setPolicy('W291847')">W291847</button>
@@ -354,8 +404,7 @@ select.filter-sel:focus{border-color:var(--blue)}
         <div class="card">
           <div class="card-head"><span class="card-title">Sheet Structure</span></div>
           <div class="card-body">
-            <p style="font-size:11px;color:var(--t3);margin-bottom:12px;line-height:1.6">Tab <span class="mono" style="background:var(--s3);padding:1px 5px;border-radius:3px">Warranties</span> — AI reads live on every call</p>
-            <div style="border:0.5px solid var(--bd);border-radius:var(--r2);overflow:hidden">
+            <div style="border:0.5px solid var(--bd);border-radius:var(--r2);overflow:hidden;margin-bottom:12px">
               <table>
                 <thead><tr><th>Column</th><th>Example</th></tr></thead>
                 <tbody>
@@ -367,6 +416,9 @@ select.filter-sel:focus{border-color:var(--blue)}
                   <tr><td class="mono" style="color:var(--blue-t)">claim_status</td><td><span class="chip chip-amber" style="font-size:10px">WIP</span></td></tr>
                 </tbody>
               </table>
+            </div>
+            <div style="background:var(--blue-d);border-radius:var(--r2);padding:10px 12px;font-size:12px;color:var(--blue-t);line-height:1.6">
+              <strong>Claim values:</strong> Accepted · WIP · Done · Rejected · None
             </div>
           </div>
         </div>
@@ -380,29 +432,19 @@ select.filter-sel:focus{border-color:var(--blue)}
           <div class="card-head"><span class="card-title">Extensions</span></div>
           <div class="card-body">
             <div class="dir-item"><div class="dir-av" style="background:var(--green-d);color:var(--green-t)">SA</div><div class="dir-info"><div class="dir-name">Sales</div><div class="dir-role">New quotes · Pricing · Renewals</div></div><div class="dir-right"><span class="ext">Ext. 101</span><div class="avail av-g"></div></div></div>
-            <div class="dir-item"><div class="dir-av" style="background:var(--blue-d);color:var(--blue-t)">CL</div><div class="dir-info"><div class="dir-name">Claims / Service</div><div class="dir-role">Filing · Status updates</div></div><div class="dir-right"><span class="ext">Ext. 102</span><div class="avail av-g"></div></div></div>
-            <div class="dir-item"><div class="dir-av" style="background:var(--purple-d);color:var(--purple-t)">AC</div><div class="dir-info"><div class="dir-name">Accounting</div><div class="dir-role">Billing · Invoices · Payments</div></div><div class="dir-right"><span class="ext">Ext. 103</span><div class="avail av-a"></div></div></div>
+            <div class="dir-item"><div class="dir-av" style="background:var(--blue-d);color:var(--blue-t)">CL</div><div class="dir-info"><div class="dir-name">Claims</div><div class="dir-role">Filing · Status updates</div></div><div class="dir-right"><span class="ext">Ext. 102</span><div class="avail av-g"></div></div></div>
+            <div class="dir-item"><div class="dir-av" style="background:var(--purple-d);color:var(--purple-t)">AC</div><div class="dir-info"><div class="dir-name">Accounting</div><div class="dir-role">Billing · Invoices</div></div><div class="dir-right"><span class="ext">Ext. 103</span><div class="avail av-a"></div></div></div>
             <div class="dir-item"><div class="dir-av" style="background:var(--amber-d);color:var(--amber-t)">MG</div><div class="dir-info"><div class="dir-name">Management</div><div class="dir-role">Escalations · Complaints</div></div><div class="dir-right"><span class="ext">Ext. 104</span><div class="avail av-r"></div></div></div>
             <div class="dir-item" style="border:none"><div class="dir-av" style="background:var(--s3);color:var(--t3)">VM</div><div class="dir-info"><div class="dir-name">Voicemail</div><div class="dir-role">After hours · Unavailable</div></div><div class="dir-right"><span class="ext">Ext. 199</span><div class="avail av-g"></div></div></div>
           </div>
         </div>
         <div class="card">
-          <div class="card-head"><span class="card-title">AI Flow</span></div>
+          <div class="card-head"><span class="card-title">AI Call Flow</span></div>
           <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
-            <div style="background:var(--s2);border-radius:var(--r2);padding:12px;font-size:12px;line-height:1.7;color:var(--t2)">
-              <strong style="color:var(--t1);display:block;margin-bottom:4px">Caller identification</strong>
-              Asks for policy # or last 6 VIN + name. Finds customer record, greets by name, confirms vehicle and plan.
-            </div>
-            <div style="background:var(--s2);border-radius:var(--r2);padding:12px;font-size:12px;line-height:1.7;color:var(--t2)">
-              <strong style="color:var(--t1);display:block;margin-bottom:4px">Intent detection</strong>
-              Claim · Coverage question · New policy · Billing · Dealer inquiry · Escalation
-            </div>
-            <div style="background:var(--green-d);border-radius:var(--r2);padding:10px 12px;font-size:12px;color:var(--green-t);line-height:1.5">
-              <strong>Business hours:</strong> Transfers to correct extension after collecting details.
-            </div>
-            <div style="background:var(--amber-d);border-radius:var(--r2);padding:10px 12px;font-size:12px;color:var(--amber-t);line-height:1.5">
-              <strong>After hours:</strong> Answers questions directly, saves structured request, or directs to voicemail.
-            </div>
+            <div style="background:var(--s2);border-radius:var(--r2);padding:12px;font-size:12px;line-height:1.7;color:var(--t2)"><strong style="color:var(--t1);display:block;margin-bottom:4px">1. Identify</strong>Asks for policy # or last 6 VIN + name. Greets by name, confirms vehicle and plan.</div>
+            <div style="background:var(--s2);border-radius:var(--r2);padding:12px;font-size:12px;line-height:1.7;color:var(--t2)"><strong style="color:var(--t1);display:block;margin-bottom:4px">2. Intent</strong>Claim · Coverage · New policy · Billing · Dealer · Escalation</div>
+            <div style="background:var(--green-d);border-radius:var(--r2);padding:10px 12px;font-size:12px;color:var(--green-t);line-height:1.5"><strong>Business hours:</strong> Transfers to correct extension.</div>
+            <div style="background:var(--amber-d);border-radius:var(--r2);padding:10px 12px;font-size:12px;color:var(--amber-t);line-height:1.5"><strong>After hours:</strong> Answers directly, saves request, or voicemail.</div>
           </div>
         </div>
       </div>
@@ -414,26 +456,26 @@ select.filter-sel:focus{border-color:var(--blue)}
         <div class="card">
           <div class="card-head"><span class="card-title">Phase 1 — Live</span><span class="chip chip-green">Done</span></div>
           <div class="card-body">
-            <div class="rm-item"><div class="rm-icon" style="background:var(--green-d)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green-t)" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg></div><div><div class="rm-title">AI phone answering 24/7</div><div class="rm-desc">Identifies clients by policy or VIN, reads warranty and claim status, full conversation flow.</div><div class="rm-phase">✓ Live</div></div></div>
-            <div class="rm-item"><div class="rm-icon" style="background:var(--green-d)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green-t)" stroke-width="2"><path d="M9 12h6m-6 4h6M5 8h14"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg></div><div><div class="rm-title">Structured request logging</div><div class="rm-desc">Every call creates a request card — claim info, new policy inquiries, dealer contacts, all categorized.</div><div class="rm-phase">✓ Live</div></div></div>
-            <div class="rm-item"><div class="rm-icon" style="background:var(--green-d)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green-t)" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div><div><div class="rm-title">Live Google Sheets CRM</div><div class="rm-desc">Reads warranty data and writes call logs + requests in real time.</div><div class="rm-phase">✓ Live</div></div></div>
-            <div class="rm-item" style="border:none"><div class="rm-icon" style="background:var(--green-d)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green-t)" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg></div><div><div class="rm-title">This dashboard</div><div class="rm-desc">Live request cards, call log, warranty lookup, routing breakdown.</div><div class="rm-phase">✓ Live</div></div></div>
+            <div class="rm-item"><div class="rm-icon" style="background:var(--green-d)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green-t)" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg></div><div><div class="rm-title">AI phone answering 24/7</div><div class="rm-desc">Identifies clients, reads warranty + claim status, full conversation.</div><div class="rm-phase">✓ Live</div></div></div>
+            <div class="rm-item"><div class="rm-icon" style="background:var(--green-d)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green-t)" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M9 12h6M9 8h4"/></svg></div><div><div class="rm-title">Structured request logging</div><div class="rm-desc">Every call → request card with claim info, intent, details.</div><div class="rm-phase">✓ Live</div></div></div>
+            <div class="rm-item"><div class="rm-icon" style="background:var(--green-d)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green-t)" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div><div><div class="rm-title">Live Google Sheets CRM</div><div class="rm-desc">Reads warranty data, writes call logs + requests in real time.</div><div class="rm-phase">✓ Live</div></div></div>
+            <div class="rm-item" style="border:none"><div class="rm-icon" style="background:var(--green-d)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green-t)" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg></div><div><div class="rm-title">Mobile-ready dashboard</div><div class="rm-desc">Live request cards, call log, warranty lookup — works on any device.</div><div class="rm-phase">✓ Live</div></div></div>
           </div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;flex-direction:column;gap:12px">
           <div class="card">
             <div class="card-head"><span class="card-title">Phase 2</span><span class="chip chip-amber">Next</span></div>
             <div class="card-body">
-              <div class="rm-item"><div class="rm-icon" style="background:var(--amber-d)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--amber-t)" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><div><div class="rm-title">SMS follow-up</div><div class="rm-desc">Auto-text after every call with request reference number and next steps.</div></div></div>
+              <div class="rm-item"><div class="rm-icon" style="background:var(--amber-d)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--amber-t)" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><div><div class="rm-title">SMS follow-up</div><div class="rm-desc">Auto-text after every call with reference # and next steps.</div></div></div>
               <div class="rm-item"><div class="rm-icon" style="background:var(--amber-d)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--amber-t)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div><div><div class="rm-title">Callback scheduling</div><div class="rm-desc">AI offers callback slots synced to Google Calendar.</div></div></div>
-              <div class="rm-item" style="border:none"><div class="rm-icon" style="background:var(--amber-d)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--amber-t)" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div><div><div class="rm-title">Request status updates</div><div class="rm-desc">Agents update request status in dashboard — client gets notified.</div></div></div>
+              <div class="rm-item" style="border:none"><div class="rm-icon" style="background:var(--amber-d)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--amber-t)" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div><div><div class="rm-title">Request status updates</div><div class="rm-desc">Agents update status in dashboard — client gets notified.</div></div></div>
             </div>
           </div>
           <div class="card">
             <div class="card-head"><span class="card-title">Phase 3</span><span class="chip chip-purple">Future</span></div>
             <div class="card-body">
-              <div class="rm-item"><div class="rm-icon" style="background:var(--purple-d)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--purple-t)" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><div><div class="rm-title">Proactive renewal outreach</div><div class="rm-desc">AI calls clients 30/60/90 days before expiry. Automated retention.</div></div></div>
-              <div class="rm-item" style="border:none"><div class="rm-icon" style="background:var(--purple-d)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--purple-t)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div><div><div class="rm-title">HubSpot / Salesforce + French</div><div class="rm-desc">Real CRM migration. French language support for Quebec.</div></div></div>
+              <div class="rm-item"><div class="rm-icon" style="background:var(--purple-d)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--purple-t)" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><div><div class="rm-title">Proactive renewal outreach</div><div class="rm-desc">AI calls clients before expiry. Automated retention.</div></div></div>
+              <div class="rm-item" style="border:none"><div class="rm-icon" style="background:var(--purple-d)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--purple-t)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div><div><div class="rm-title">HubSpot + French support</div><div class="rm-desc">Real CRM migration. French language for Quebec market.</div></div></div>
             </div>
           </div>
         </div>
@@ -442,9 +484,38 @@ select.filter-sel:focus{border-color:var(--blue)}
 
   </div>
 </div>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <div class="bnav-item active" id="bnav-overview" onclick="showPageMobile('overview','bnav-overview')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      <span class="bnav-label">Overview</span>
+    </div>
+    <div class="bnav-item" id="bnav-requests" onclick="showPageMobile('requests','bnav-requests')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M9 12h6M9 8h4"/></svg>
+      <span class="bnav-label">Requests</span>
+      <span class="bnav-badge" id="bnav-badge" style="display:none">0</span>
+    </div>
+    <div class="bnav-item" id="bnav-calls" onclick="showPageMobile('calls','bnav-calls')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+      <span class="bnav-label">Calls</span>
+    </div>
+    <div class="bnav-item" id="bnav-crm" onclick="showPageMobile('crm','bnav-crm')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <span class="bnav-label">Lookup</span>
+    </div>
+    <div class="bnav-item" id="bnav-directory" onclick="showPageMobile('directory','bnav-directory')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      <span class="bnav-label">Directory</span>
+    </div>
+  </div>
+</nav>
+
 <div class="toast" id="toast"></div>
+
 <script>
-const pages={overview:{t:'Overview',s:'Live stats — auto-refreshes every 60s'},requests:{t:'Requests',s:'All incoming requests — click a card for details'},calls:{t:'Call Log',s:'All calls — click a row for details'},crm:{t:'Warranty Lookup',s:'Search policies from Google Sheets'},directory:{t:'Directory & Routing',s:'Extensions and AI flow'},roadmap:{t:'Feature Roadmap',s:'MVP scope and next steps'}};
+const pages={overview:{t:'Overview',s:'Live stats'},requests:{t:'Requests',s:'All requests — tap for details'},calls:{t:'Call Log',s:'All calls — tap for details'},crm:{t:'Warranty Lookup',s:'Search policies'},directory:{t:'Directory',s:'Extensions and AI flow'},roadmap:{t:'Roadmap',s:'What we built and what is next'}};
 let allCalls=[],allRequests=[],filtCalls=[],filtRequests=[];
 
 function showPage(id,el){
@@ -458,13 +529,25 @@ function showPage(id,el){
   if(id==='requests')renderReqCards('req-cards',filtRequests);
 }
 
+function showPageMobile(id,btnId){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.bnav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.getElementById(btnId).classList.add('active');
+  if(id==='calls')renderCallsTable();
+  if(id==='requests')renderReqCards('req-cards',filtRequests);
+}
+
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)}
 
 function updateClock(){
   const et=new Date(new Date().toLocaleString('en-US',{timeZone:'America/Toronto'}));
   const h=et.getHours(),open=h>=9&&h<17&&et.getDay()>0&&et.getDay()<6;
-  document.getElementById('time-chip').textContent=et.toLocaleTimeString('en-CA',{hour:'2-digit',minute:'2-digit',hour12:false})+' ET';
-  document.getElementById('time-chip').className='chip '+(open?'chip-green':'chip-amber');
+  const timeStr=et.toLocaleTimeString('en-CA',{hour:'2-digit',minute:'2-digit',hour12:false})+' ET';
+  const chip=document.getElementById('time-chip');
+  const mchip=document.getElementById('mobile-time');
+  if(chip){chip.textContent=timeStr;chip.className='chip '+(open?'chip-green':'chip-amber')}
+  if(mchip){mchip.textContent=timeStr;mchip.className='chip '+(open?'chip-green':'chip-amber')+' font-size:10px'}
 }
 setInterval(updateClock,1000);updateClock();
 
@@ -476,9 +559,10 @@ async function fetchStats(){
     document.getElementById('m-accuracy').textContent=d.accuracy+'%';
     document.getElementById('m-vm').textContent=d.voicemail;
     document.getElementById('m-req').textContent=d.new_requests;
-    document.getElementById('m-total-sub').textContent='calls today';
     document.getElementById('nav-req-count').textContent=d.new_requests;
-    if(d.new_requests>0)document.getElementById('nav-req-count').className='nav-count alert';
+    const badge=document.getElementById('bnav-badge');
+    if(d.new_requests>0){badge.textContent=d.new_requests;badge.style.display='flex';document.getElementById('nav-req-count').className='nav-count alert';}
+    else{badge.style.display='none'}
   }catch{['m-total','m-routed','m-accuracy','m-vm','m-req'].forEach(id=>document.getElementById(id).textContent='—')}
 }
 
@@ -488,9 +572,8 @@ async function fetchCalls(){
     filtCalls=[...allCalls];
     document.getElementById('nav-call-count').textContent=allCalls.length;
     document.getElementById('call-count').textContent=allCalls.length+' calls';
-    renderRecentCalls();
     renderBreakdown();
-  }catch{document.getElementById('breakdown').innerHTML='<div class="empty">No data</div>'}
+  }catch{}
 }
 
 async function fetchRequests(){
@@ -504,24 +587,13 @@ async function fetchRequests(){
   }catch{}
 }
 
-function renderRecentCalls(){
+function renderBreakdown(){
   const el=document.getElementById('breakdown');
   const counts={Claims:0,Sales:0,Accounting:0,Management:0,Voicemail:0};
-  allCalls.forEach(c=>{
-    const r=c.routed_to||'';
-    if(r.includes('Claims'))counts.Claims++;
-    else if(r.includes('Sales'))counts.Sales++;
-    else if(r.includes('Account'))counts.Accounting++;
-    else if(r.includes('Management'))counts.Management++;
-    else counts.Voicemail++;
-  });
+  allCalls.forEach(c=>{const r=c.routed_to||'';if(r.includes('Claims'))counts.Claims++;else if(r.includes('Sales'))counts.Sales++;else if(r.includes('Account'))counts.Accounting++;else if(r.includes('Management'))counts.Management++;else counts.Voicemail++;});
   const total=allCalls.length||1;
   const colors={Claims:'var(--blue)',Sales:'var(--green)',Accounting:'var(--purple)',Management:'var(--amber)',Voicemail:'var(--t3)'};
-  el.innerHTML=Object.entries(counts).map(([k,v])=>`
-    <div class="bar-item">
-      <div class="bar-top"><span style="color:var(--t2)">${k}</span><span style="color:${colors[k]};font-weight:500">${v}</span></div>
-      <div class="bar-track"><div class="bar-fill" style="background:${colors[k]};width:${Math.round(v/total*100)}%"></div></div>
-    </div>`).join('');
+  el.innerHTML=Object.entries(counts).map(([k,v])=>`<div class="bar-item"><div class="bar-top"><span style="color:var(--t2)">${k}</span><span style="color:${colors[k]};font-weight:500">${v}</span></div><div class="bar-track"><div class="bar-fill" style="background:${colors[k]};width:${Math.round(v/total*100)}%"></div></div></div>`).join('');
 }
 
 function renderReqBreakdown(){
@@ -529,45 +601,37 @@ function renderReqBreakdown(){
   const counts={};
   allRequests.forEach(r=>{const t=r.type||'Other';counts[t]=(counts[t]||0)+1});
   const total=allRequests.length||1;
-  const colors={'Claim':'var(--blue)','New Policy':'var(--green)','Status Check':'var(--purple)','Billing':'var(--amber)','Escalation':'var(--red)','Dealer':'var(--blue-t)','Other':'var(--t3)'};
-  el.innerHTML=Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`
-    <div class="bar-item">
-      <div class="bar-top"><span style="color:var(--t2)">${k}</span><span style="color:${colors[k]||'var(--t2)'};font-weight:500">${v}</span></div>
-      <div class="bar-track"><div class="bar-fill" style="background:${colors[k]||'var(--t3)'};width:${Math.round(v/total*100)}%"></div></div>
-    </div>`).join('');
+  const colors={Claim:'var(--blue)','New Policy':'var(--green)','Status Check':'var(--purple)',Billing:'var(--amber)',Escalation:'var(--red)',Dealer:'var(--blue-t)',Other:'var(--t3)'};
+  el.innerHTML=Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="bar-item"><div class="bar-top"><span style="color:var(--t2)">${k}</span><span style="color:${colors[k]||'var(--t2)'};font-weight:500">${v}</span></div><div class="bar-track"><div class="bar-fill" style="background:${colors[k]||'var(--t3)'};width:${Math.round(v/total*100)}%"></div></div></div>`).join('');
 }
 
-const typeColors={Claim:'var(--blue-d)',typeText:{Claim:'var(--blue-t)'}};
-const typeIcons={
-  Claim:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M12 18v-6M9 15h6"/></svg>`,
-  'New Policy':`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
-  'Status Check':`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>`,
-  Billing:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>`,
-  Escalation:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
-  Dealer:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>`,
-};
-const typeBg={Claim:'var(--blue-d)',`New Policy`:'var(--green-d)','Status Check':'var(--purple-d)',Billing:'var(--amber-d)',Escalation:'var(--red-d)',Dealer:'var(--blue-d)',Other:'var(--s3)'};
+const typeBg={Claim:'var(--blue-d)','New Policy':'var(--green-d)','Status Check':'var(--purple-d)',Billing:'var(--amber-d)',Escalation:'var(--red-d)',Dealer:'var(--blue-d)',Other:'var(--s3)'};
 const typeCol={Claim:'var(--blue-t)','New Policy':'var(--green-t)','Status Check':'var(--purple-t)',Billing:'var(--amber-t)',Escalation:'var(--red-t)',Dealer:'var(--blue-t)',Other:'var(--t3)'};
+const iClaim='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M12 18v-6M9 15h6"/></svg>';
+const iPolicy='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>';
+const iStatus='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>';
+const iBilling='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>';
+const iEscalation='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>';
+const iDealer='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>';
+function getIcon(t){if(t==='Claim')return iClaim;if(t==='New Policy')return iPolicy;if(t==='Status Check')return iStatus;if(t==='Billing')return iBilling;if(t==='Escalation')return iEscalation;if(t==='Dealer')return iDealer;return iClaim;}
 const statusChip={New:'chip-amber','In Progress':'chip-blue',Done:'chip-green',Escalated:'chip-red'};
 
-function renderReqCards(containerId, reqs){
+function renderReqCards(containerId,reqs){
   const el=document.getElementById(containerId);
   if(!reqs||!reqs.length){el.innerHTML='<div class="empty">No requests yet</div>';return}
   el.innerHTML=reqs.map(r=>{
-    const bg=typeBg[r.type]||'var(--s3)';
-    const col=typeCol[r.type]||'var(--t2)';
-    const icon=typeIcons[r.type]||typeIcons.Claim;
+    const bg=({Claim:'var(--blue-d)','New Policy':'var(--green-d)','Status Check':'var(--purple-d)',Billing:'var(--amber-d)',Escalation:'var(--red-d)',Dealer:'var(--blue-d)'})[r.type]||'var(--s3)';
+    const col=({Claim:'var(--blue-t)','New Policy':'var(--green-t)','Status Check':'var(--purple-t)',Billing:'var(--amber-t)',Escalation:'var(--red-t)',Dealer:'var(--blue-t)'})[r.type]||'var(--t2)';
+    const icon=getIcon(r.type);
     const sc=statusChip[r.status]||'chip-gray';
     const details=parseDetails(r.details);
-    return `<div class="req-card" onclick='showReqDetail(${JSON.stringify(r).replace(/'/g,"&#39;")})'>
+    const safeR=JSON.stringify(r).replace(/'/g,"&#39;").replace(/"/g,'&quot;');
+    return `<div class="req-card" onclick="showReqDetail('${safeR}')">
       <div class="req-card-top">
-        <div>
-          <div class="req-card-name">${r.name||'Unknown caller'}</div>
-          <div class="req-card-sub">${r.vehicle||r.policyId||r.phone||'—'}</div>
-        </div>
+        <div><div class="req-card-name">${r.name||'Unknown'}</div><div class="req-card-sub">${r.vehicle||r.policyId||r.phone||'—'}</div></div>
         <div class="req-type-icon" style="background:${bg};color:${col}">${icon}</div>
       </div>
-      <div class="req-card-body">${r.summary||'No summary available'}</div>
+      <div class="req-card-body">${r.summary||'No summary'}</div>
       ${details?`<div style="font-size:11px;color:var(--t3);margin-bottom:8px;line-height:1.5">${details}</div>`:''}
       <div class="req-card-foot">
         <span class="chip ${sc}" style="font-size:10px">${r.status||'New'}</span>
@@ -582,51 +646,40 @@ function renderReqCards(containerId, reqs){
 
 function parseDetails(raw){
   if(!raw||raw==='{}')return'';
-  try{
-    const d=JSON.parse(raw);
-    return Object.entries(d).filter(([,v])=>v).map(([k,v])=>`<span style="color:var(--t3)">${k.replace(/_/g,' ')}:</span> ${v}`).join(' · ');
-  }catch{return raw}
+  try{const d=JSON.parse(raw);return Object.entries(d).filter(([,v])=>v).map(([k,v])=>`<span style="color:var(--t3)">${k.replace(/_/g,' ')}:</span> ${v}`).join(' · ');}
+  catch{return raw}
 }
 
-function showReqDetail(r){
-  if(typeof r==='string')r=JSON.parse(r);
+function showReqDetail(rStr){
+  const r=JSON.parse(rStr.replace(/&quot;/g,'"'));
   const details=r.details&&r.details!=='{}'?parseDetails(r.details):'—';
-  const html=`
-    <div style="padding:14px 16px;background:var(--s2);border-top:0.5px solid var(--bd)">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
-        <div><div style="font-size:10px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Caller</div><div style="font-size:13px;font-weight:500">${r.name||'—'}</div></div>
-        <div><div style="font-size:10px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Phone</div><div class="mono" style="font-size:12px">${r.phone||'—'}</div></div>
-        <div><div style="font-size:10px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Policy</div><div class="mono" style="font-size:12px;color:var(--blue-t)">${r.policyId||'—'}</div></div>
-        <div><div style="font-size:10px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Vehicle</div><div style="font-size:12px">${r.vehicle||'—'}</div></div>
-        <div><div style="font-size:10px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Type</div><div style="font-size:12px">${r.type||'—'}</div></div>
-        <div><div style="font-size:10px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Department</div><div style="font-size:12px">${r.department||'—'}</div></div>
-      </div>
-      <div style="margin-bottom:10px"><div style="font-size:10px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Summary</div><div style="font-size:12px;color:var(--t2);line-height:1.6">${r.summary||'—'}</div></div>
-      ${details!=='—'?`<div><div style="font-size:10px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Details</div><div style="font-size:11px;color:var(--t3);line-height:1.7">${details}</div></div>`:''}
-    </div>`;
-  const existing=document.getElementById('req-detail-'+r.timestamp?.replace(/\W/g,''));
+  const id='rd-'+(r.timestamp||'x').replace(/\W/g,'');
+  const existing=document.getElementById(id);
   if(existing){existing.remove();return}
-  const cards=document.getElementById('req-cards');
+  const html=`<div id="${id}" style="grid-column:1/-1;background:var(--s1);border:0.5px solid var(--blue-d);border-radius:var(--r);padding:14px;margin-top:-4px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div><div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Caller</div><div style="font-size:13px;font-weight:500">${r.name||'—'}</div></div>
+      <div><div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Phone</div><div class="mono" style="font-size:12px">${r.phone||'—'}</div></div>
+      <div><div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Policy</div><div class="mono" style="font-size:12px;color:var(--blue-t)">${r.policyId||'—'}</div></div>
+      <div><div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Vehicle</div><div style="font-size:12px">${r.vehicle||'—'}</div></div>
+      <div><div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Dept</div><div style="font-size:12px">${r.department||'—'}</div></div>
+      <div><div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Type</div><div style="font-size:12px">${r.type||'—'}</div></div>
+    </div>
+    <div style="margin-bottom:8px"><div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Summary</div><div style="font-size:12px;color:var(--t2);line-height:1.6">${r.summary||'—'}</div></div>
+    ${details!=='—'?`<div><div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Details</div><div style="font-size:11px;color:var(--t3);line-height:1.7">${details}</div></div>`:''}
+    <button onclick="document.getElementById('${id}').remove()" style="margin-top:10px;padding:5px 10px;background:var(--s3);border:0.5px solid var(--bd);border-radius:6px;font-size:11px;cursor:pointer;color:var(--t2);font-family:var(--font)">Close</button>
+  </div>`;
+  const cards=document.getElementById(containerId==='ov-requests'?'ov-requests':'req-cards');
   const div=document.createElement('div');
-  div.id='req-detail-'+(r.timestamp?.replace(/\W/g,'')||'x');
-  div.style.gridColumn='1/-1';
   div.innerHTML=html;
-  const allCards=[...cards.querySelectorAll('.req-card')];
-  const clicked=allCards.find(c=>c.textContent.includes(r.name||''));
-  if(clicked)clicked.after(div);else cards.appendChild(div);
+  cards.appendChild(div.firstChild);
 }
 
 function filterRequests(){
   const q=document.getElementById('req-search').value.toLowerCase();
   const type=document.getElementById('req-type-filter').value;
   const status=document.getElementById('req-status-filter').value;
-  const dept=document.getElementById('req-dept-filter').value;
-  filtRequests=allRequests.filter(r=>
-    (!q||(r.name||'').toLowerCase().includes(q)||(r.summary||'').toLowerCase().includes(q)||(r.policyId||'').toLowerCase().includes(q)||(r.vehicle||'').toLowerCase().includes(q))&&
-    (!type||r.type===type)&&
-    (!status||r.status===status)&&
-    (!dept||(r.department||'').includes(dept))
-  );
+  filtRequests=allRequests.filter(r=>(!q||(r.name||'').toLowerCase().includes(q)||(r.summary||'').toLowerCase().includes(q)||(r.policyId||'').toLowerCase().includes(q))&&(!type||r.type===type)&&(!status||r.status===status));
   document.getElementById('req-count').textContent=filtRequests.length+' requests';
   renderReqCards('req-cards',filtRequests);
 }
@@ -634,15 +687,17 @@ function filterRequests(){
 function renderCallsTable(){
   const tbody=document.getElementById('calls-tbody');
   if(!filtCalls.length){tbody.innerHTML='<tr><td colspan="6" class="empty">No calls</td></tr>';return}
-  tbody.innerHTML=filtCalls.map(c=>`
-    <tr class="row-click" onclick='showCallDetail(${JSON.stringify(c).replace(/'/g,"&#39;")})'>
+  tbody.innerHTML=filtCalls.map(c=>{
+    const safe=JSON.stringify(c).replace(/'/g,"&#39;").replace(/"/g,'&quot;');
+    return `<tr class="row-click" onclick="showCallDetail('${safe}')">
       <td class="mono dim">${formatTime(c.timestamp)}</td>
       <td><div style="font-weight:500">${c.name||'Unknown'}</div><div class="mono dim" style="font-size:10px">${c.phone}</div></td>
       <td class="mono" style="color:var(--blue-t)">${c.policy_id||'—'}</td>
-      <td style="color:var(--t2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.reason||'—'}</td>
+      <td style="color:var(--t2);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.reason||'—'}</td>
       <td>${routeChip(c.routed_to)}</td>
       <td>${statusChipHtml(c.status)}</td>
-    </tr>`).join('');
+    </tr>`;
+  }).join('');
 }
 
 function filterCalls(){
@@ -651,21 +706,21 @@ function filterCalls(){
   const today=new Date().toISOString().slice(0,10);
   const weekAgo=new Date(Date.now()-7*864e5).toISOString().slice(0,10);
   filtCalls=allCalls.filter(c=>{
-    const match=!q||(c.name||'').toLowerCase().includes(q)||(c.phone||'').includes(q)||(c.policy_id||'').toLowerCase().includes(q)||(c.reason||'').toLowerCase().includes(q);
-    const dateMatch=!df||(df==='today'&&c.timestamp?.startsWith(today))||(df==='week'&&c.timestamp>=weekAgo);
-    return match&&dateMatch;
+    const m=!q||(c.name||'').toLowerCase().includes(q)||(c.phone||'').includes(q)||(c.policy_id||'').toLowerCase().includes(q)||(c.reason||'').toLowerCase().includes(q);
+    const dm=!df||(df==='today'&&c.timestamp?.startsWith(today))||(df==='week'&&c.timestamp>=weekAgo);
+    return m&&dm;
   });
   document.getElementById('call-count').textContent=filtCalls.length+' calls';
   renderCallsTable();
 }
 
-function showCallDetail(c){
-  if(typeof c==='string')c=JSON.parse(c);
+function showCallDetail(cStr){
+  const c=JSON.parse(cStr.replace(/&quot;/g,'"'));
   document.getElementById('call-detail-title').textContent=(c.name||'Unknown')+' · '+formatTime(c.timestamp);
   document.getElementById('call-detail-body').innerHTML=`
     <div class="detail-field"><label>Name</label><span>${c.name||'—'}</span></div>
     <div class="detail-field"><label>Phone</label><span class="mono">${c.phone||'—'}</span></div>
-    <div class="detail-field"><label>Policy #</label><span class="mono" style="color:var(--blue-t)">${c.policy_id||'—'}</span></div>
+    <div class="detail-field"><label>Policy</label><span class="mono" style="color:var(--blue-t)">${c.policy_id||'—'}</span></div>
     <div class="detail-field"><label>Reason</label><span>${c.reason||'—'}</span></div>
     <div class="detail-field"><label>Routed to</label><span>${c.routed_to||'—'}</span></div>
     <div class="detail-field"><label>Status</label><span>${c.status||'—'}</span></div>
@@ -700,35 +755,11 @@ async function lookupCRM(){
 }
 
 function setPolicy(p){document.getElementById('policy-input').value=p;lookupCRM()}
+function formatTime(ts){if(!ts)return'—';try{return new Date(ts).toLocaleString('en-CA',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false})}catch{return ts.slice(0,16)||ts}}
+function routeChip(rt){if(!rt)return'<span class="dim">—</span>';if(rt.includes('Sales'))return`<span class="chip chip-green" style="font-size:10px">${rt}</span>`;if(rt.includes('Claims'))return`<span class="chip chip-blue" style="font-size:10px">${rt}</span>`;if(rt.includes('Account'))return`<span class="chip chip-purple" style="font-size:10px">${rt}</span>`;if(rt.includes('Management'))return`<span class="chip chip-amber" style="font-size:10px">${rt}</span>`;return`<span class="chip chip-gray" style="font-size:10px">${rt}</span>`;}
+function statusChipHtml(s){if(!s)return'—';if(s==='Completed')return`<span class="chip chip-gray" style="font-size:10px">Completed</span>`;if(s==='VM Left')return`<span class="chip chip-amber" style="font-size:10px">VM Left</span>`;return`<span class="chip chip-gray" style="font-size:10px">${s}</span>`;}
 
-function formatTime(ts){
-  if(!ts)return'—';
-  try{return new Date(ts).toLocaleString('en-CA',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false})}
-  catch{return ts.slice(0,16)||ts}
-}
-
-function routeChip(rt){
-  if(!rt)return'<span class="dim">—</span>';
-  if(rt.includes('Sales'))return`<span class="chip chip-green" style="font-size:10px">${rt}</span>`;
-  if(rt.includes('Claims'))return`<span class="chip chip-blue" style="font-size:10px">${rt}</span>`;
-  if(rt.includes('Account'))return`<span class="chip chip-purple" style="font-size:10px">${rt}</span>`;
-  if(rt.includes('Management'))return`<span class="chip chip-amber" style="font-size:10px">${rt}</span>`;
-  return`<span class="chip chip-gray" style="font-size:10px">${rt}</span>`;
-}
-
-function statusChipHtml(s){
-  if(!s)return'—';
-  if(s==='Completed')return`<span class="chip chip-gray" style="font-size:10px">Completed</span>`;
-  if(s==='VM Left')return`<span class="chip chip-amber" style="font-size:10px">VM Left</span>`;
-  return`<span class="chip chip-gray" style="font-size:10px">${s}</span>`;
-}
-
-async function refreshAll(){
-  toast('Refreshing...');
-  await Promise.all([fetchStats(),fetchCalls(),fetchRequests()]);
-  toast('Updated ✓');
-}
-
+async function refreshAll(){toast('Refreshing...');await Promise.all([fetchStats(),fetchCalls(),fetchRequests()]);toast('Updated ✓')}
 refreshAll();
 setInterval(refreshAll,60000);
 </script>
