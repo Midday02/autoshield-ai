@@ -57,7 +57,7 @@ export async function logCall(session) {
           session.from,
           session.name || '',
           session.policyId || '',
-          session.reason || '',
+          session.reason || session.intent || '',
           session.routedTo || '',
           'Completed',
           '',
@@ -66,6 +66,38 @@ export async function logCall(session) {
     });
   } catch (e) {
     console.error('logCall error:', e.message);
+  }
+}
+
+export async function logRequestToSheets(entry) {
+  try {
+    const sheets = await getSheets();
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: SHEET_ID,
+      range: 'Requests!A:O',
+      valueInputOption: 'USER_ENTERED',
+      resource: {
+        values: [[
+          entry.timestamp,
+          entry.type,
+          entry.callerType,
+          entry.name,
+          entry.phone,
+          entry.policyId,
+          entry.vehicle,
+          entry.vin || '',
+          entry.department,
+          entry.summary,
+          entry.details,
+          entry.status,
+          entry.assignedTo,
+          entry.followUp,
+          entry.resolvedAt,
+        ]],
+      },
+    });
+  } catch (e) {
+    console.error('logRequestToSheets error:', e.message);
   }
 }
 
@@ -93,6 +125,37 @@ export async function getCallLog() {
     }));
   } catch (e) {
     console.error('getCallLog error:', e.message);
+    return [];
+  }
+}
+
+export async function getRequests() {
+  try {
+    const sheets = await getSheets();
+    const res = await sheets.spreadsheets.values.get({
+      spreadsheetId: SHEET_ID,
+      range: 'Requests!A2:O500',
+    });
+    const rows = res.data.values || [];
+    return rows.reverse().slice(0, 200).map(r => ({
+      timestamp:   r[0] || '',
+      type:        r[1] || '',
+      callerType:  r[2] || '',
+      name:        r[3] || '',
+      phone:       r[4] || '',
+      policyId:    r[5] || '',
+      vehicle:     r[6] || '',
+      vin:         r[7] || '',
+      department:  r[8] || '',
+      summary:     r[9] || '',
+      details:     r[10] || '',
+      status:      r[11] || '',
+      assignedTo:  r[12] || '',
+      followUp:    r[13] || '',
+      resolvedAt:  r[14] || '',
+    }));
+  } catch (e) {
+    console.error('getRequests error:', e.message);
     return [];
   }
 }
