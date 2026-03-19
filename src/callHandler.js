@@ -27,6 +27,20 @@ function gather(r, callSid, sayText) {
   r.redirect(`/voice/speech?callSid=${callSid}&fallback=1`);
 }
 
+// Convert spoken numbers to digits: "W four eight two zero three one" -> "W482031"
+function normalizeSpeech(text) {
+  const numWords = {
+    zero:'0',one:'1',two:'2',three:'3',four:'4',
+    five:'5',six:'6',seven:'7',eight:'8',nine:'9',oh:'0',nought:'0'
+  };
+  let s = text
+    .replace(/\bdouble\s+you\b/gi, 'W')
+    .replace(/\b(zero|one|two|three|four|five|six|seven|eight|nine|oh|nought)\b/gi,
+      m => numWords[m.toLowerCase()] || m);
+  s = s.replace(/[Ww][\s0-9]{6,}/g, m => m.replace(/\s/g, ''));
+  return s;
+}
+
 function newSession(callSid, from) {
   return {
     callSid, from,
@@ -34,7 +48,7 @@ function newSession(callSid, from) {
     reason: null, intent: null, callerType: null, dealerName: null,
     claimDetails: {}, messages: [], routedTo: null,
     afterHours: isAfterHours(), stage: 'identify',
-    identified: false, fallbackCount: 0,
+    identified: false, fallbackCount: 0, logged: false,
     startTime: new Date().toISOString(),
   };
 }
@@ -57,7 +71,7 @@ export async function handleIncomingCall(req, res) {
   console.log(`[CALL] Incoming: ${callSid} from ${from}`);
   const r = new TwiML.VoiceResponse();
   const greeting = s.afterHours
-    ? `Thanks for calling A-Protect Warranty. Our office is closed but I can still help — I can check your coverage, update you on a claim, or take your request for our team. Do you have your policy number?`
+    ? `Thanks for calling A-Protect Warranty. Our office is closed but I can still help — check coverage, claim updates, or take your request. Do you have your policy number?`
     : `Thanks for calling A-Protect Warranty. Could I get your policy number to pull up your account? It starts with W followed by six digits.`;
   gather(r, callSid, greeting);
   res.type('text/xml').send(r.toString());
@@ -66,13 +80,13 @@ export async function handleIncomingCall(req, res) {
 export async function handleUserSpeech(req, res) {
   const callSid = req.query.callSid || req.body.CallSid;
   const from = req.body.From || 'Unknown';
-  const speech = (req.body.SpeechResult || '').trim();
+  const rawSpeech = (req.body.SpeechResult || '').trim();
+  const speech = normalizeSpeech(rawSpeech);
   const s = getSession(callSid, from);
   const r = new TwiML.VoiceResponse();
 
-  console.log(`[SPEECH] ${callSid} | "${speech}" | stage:${s.stage} | identified:${s.identified}`);
+  console.log(`[SPEECH] raw:"${rawSpeech}" | normalized:"${speech}" | stage:${s.stage}`);
 
-  // Handle silence
   if (!speech) {
     s.fallbackCount = (s.fallbackCount || 0) + 1;
     sessions.set(callSid, s);
@@ -80,7 +94,8 @@ export async function handleUserSpeech(req, res) {
       s.routedTo = 'Voicemail (no response)';
       sessions.set(callSid, s);
       await safeLogCall(s);
-      r.say({ voice: 'Polly.Matthew' }, `No worries. Please leave your name and number after the beep and we will call you back.`);
+      await safeLogRequest(s, 'No response from caller');
+      r.say({ voice: 'Polly.Matthew' }, `No worries. Leave your name and number after the beep and we will call you back.`);
       r.record({ action: `/voice/recording?callSid=${callSid}`, maxLength: 120, playBeep: true });
     } else {
       gather(r, callSid, `Sorry, I did not catch that. Could you say that again?`);
@@ -91,21 +106,20 @@ export async function handleUserSpeech(req, res) {
   s.fallbackCount = 0;
 
   // Extract policy number W######
-  const policyMatch = speech.match(/[Ww]\s*\d[\s\d]{5}/);
+  const policyMatch = speech.match(/[Ww]\d{6}/);
   if (policyMatch) {
-    const clean = policyMatch[0].replace(/\s/g, '').toUpperCase();
-    if (clean.match(/^W\d{6}$/)) s.policyId = clean;
+    s.policyId = policyMatch[0].toUpperCase();
+    console.log(`[POLICY EXTRACTED] ${s.policyId}`);
   }
 
-  // Extract last 6 digits of VIN
+  // Extract last 6 VIN digits
   const vinMatch = speech.replace(/\s/g, '').match(/[A-HJ-NPR-Z0-9]{6}$/i);
-  if (vinMatch && !s.policyId && !s.identified) {
-    s.vinFragment = vinMatch[0].toUpperCase();
-  }
+  if (vinMatch && !s.policyId && !s.identified) s.vinFragment = vinMatch[0].toUpperCase();
 
-  s.messages.push({ role: 'user', content: speech });
+  // Store original speech in history
+  s.messages.push({ role: 'user', content: rawSpeech });
 
-  // Look up policy
+  // Policy lookup
   let policyData = null;
   if (s.policyId && !s.identified) {
     policyData = await lookupPolicy(s.policyId);
@@ -114,7 +128,10 @@ export async function handleUserSpeech(req, res) {
       s.vehicle = policyData.vehicle;
       s.planType = policyData.plan_type;
       if (!s.name) s.name = policyData.customer_name;
-      console.log(`[IDENTIFIED by policy] ${s.policyId} — ${policyData.customer_name}`);
+      s.stage = 'greet';
+      console.log(`[IDENTIFIED] ${s.policyId} — ${policyData.customer_name}`);
+    } else {
+      console.log(`[NOT FOUND] ${s.policyId}`);
     }
   } else if (s.vinFragment && !s.identified) {
     policyData = await lookupPolicyByVin(s.vinFragment);
@@ -124,31 +141,28 @@ export async function handleUserSpeech(req, res) {
       s.vehicle = policyData.vehicle;
       s.planType = policyData.plan_type;
       if (!s.name) s.name = policyData.customer_name;
-      console.log(`[IDENTIFIED by VIN] ${s.vinFragment} → ${s.policyId} — ${policyData.customer_name}`);
+      s.stage = 'greet';
+      console.log(`[IDENTIFIED by VIN] ${s.policyId} — ${policyData.customer_name}`);
     }
   } else if (s.policyId && s.identified) {
     policyData = await lookupPolicy(s.policyId);
   }
 
-  // Load plan data if we have a plan type
   let planData = null;
   if (s.planType) planData = await getPlanDetails(s.planType);
 
-  // Load all plans for general questions
   let allPlans = [];
-  const speechLower = speech.toLowerCase();
-  const plansKeywords = ['what plans', 'what coverage', 'what options', 'types of warranty',
-    'what warranties', 'available plans', 'recommend', 'which plan', 'best plan',
-    'what do you offer', 'upgrade', 'what packages'];
-  const needsAllPlans = plansKeywords.some(k => speechLower.includes(k));
-  if (needsAllPlans) {
+  const sl = speech.toLowerCase();
+  const plansKw = ['what plans','what coverage','what options','types of warranty',
+    'available plans','recommend','which plan','best plan','what do you offer','upgrade'];
+  if (plansKw.some(k => sl.includes(k))) {
     allPlans = await getAllPlans();
-    console.log(`[PLANS] Loaded ${allPlans.length} plans for general query`);
+    console.log(`[PLANS] Loaded ${allPlans.length} plans`);
   }
 
   sessions.set(callSid, s);
 
-  const ai = await getAIResponse(s, speech, policyData, planData, allPlans);
+  const ai = await getAIResponse(s, rawSpeech, policyData, planData, allPlans);
 
   if (ai.extracted?.name && !s.name) s.name = ai.extracted.name;
   if (ai.extracted?.reason) s.reason = ai.extracted.reason;
@@ -161,9 +175,14 @@ export async function handleUserSpeech(req, res) {
   s.messages.push({ role: 'assistant', content: ai.speech });
   sessions.set(callSid, s);
 
-  console.log(`[AI] action:${ai.action} | ext:${ai.extension} | "${ai.speech?.slice(0,80)}"`);
+  console.log(`[AI] action:${ai.action} | stage:${s.stage} | "${ai.speech?.slice(0,80)}"`);
 
   if (ai.action === 'collect_more' || ai.action === 'provide_info') {
+    gather(r, callSid, ai.speech);
+
+  } else if (ai.action === 'confirm') {
+    s.stage = 'confirm';
+    sessions.set(callSid, s);
     gather(r, callSid, ai.speech);
 
   } else if (ai.action === 'transfer') {
@@ -172,7 +191,8 @@ export async function handleUserSpeech(req, res) {
       sessions.set(callSid, s);
       await safeLogCall(s);
       await safeLogRequest(s, ai.summary || s.reason || '');
-      gather(r, callSid, `Our team is not available right now. I have saved your request and someone will follow up next business day.`);
+      r.say({ voice: 'Polly.Matthew' }, `I have saved your request and someone will follow up next business day. Have a great day!`);
+      r.hangup();
     } else {
       const dept = EXTENSIONS[ai.extension];
       const isPlaceholder = !dept?.phoneNumber || dept.phoneNumber.includes('555');
@@ -181,7 +201,8 @@ export async function handleUserSpeech(req, res) {
         sessions.set(callSid, s);
         await safeLogCall(s);
         await safeLogRequest(s, ai.summary || s.reason || '');
-        gather(r, callSid, `I have passed your details to the ${dept?.name || 'team'} and they will call you back shortly. Is there anything else I can help with?`);
+        r.say({ voice: 'Polly.Matthew' }, `I have logged your request for the ${dept?.name || 'team'} and they will call you back. Have a great day!`);
+        r.hangup();
       } else {
         s.routedTo = `${dept.name} · Ext. ${ai.extension}`;
         sessions.set(callSid, s);
@@ -198,7 +219,8 @@ export async function handleUserSpeech(req, res) {
     sessions.set(callSid, s);
     await safeLogCall(s);
     await safeLogRequest(s, ai.summary || s.reason || '');
-    gather(r, callSid, ai.speech);
+    r.say({ voice: 'Polly.Matthew' }, ai.speech);
+    r.hangup();
 
   } else if (ai.action === 'voicemail') {
     s.routedTo = `Voicemail · ${ai.department || 'General'}`;
@@ -212,7 +234,9 @@ export async function handleUserSpeech(req, res) {
     s.routedTo = s.routedTo || 'Self-served';
     sessions.set(callSid, s);
     await safeLogCall(s);
-    if (s.intent || s.reason) await safeLogRequest(s, ai.summary || s.reason || '');
+    if (s.intent || s.reason || s.policyId) {
+      await safeLogRequest(s, ai.summary || s.reason || s.intent || 'Call completed');
+    }
     r.say({ voice: 'Polly.Matthew' }, ai.speech);
     r.hangup();
 
@@ -237,9 +261,28 @@ export async function handleRecording(req, res) {
   res.type('text/xml').send(r.toString());
 }
 
+export async function handleCallStatus(req, res) {
+  const callSid = req.body.CallSid;
+  const status = req.body.CallStatus;
+  const from = req.body.From || req.body.Called;
+  console.log(`[STATUS] ${callSid} — ${status}`);
+  if (status === 'completed' || status === 'no-answer' || status === 'busy') {
+    const s = sessions.get(callSid) || (from ? sessionsByPhone.get(from) : null);
+    if (s && !s.logged && (s.policyId || s.name || s.reason || s.intent)) {
+      if (!s.routedTo) s.routedTo = 'Call ended';
+      await safeLogCall(s);
+      await safeLogRequest(s, s.reason || s.intent || 'Call ended without resolution');
+      console.log(`[AUTO-LOG] ${s.name} / ${s.policyId}`);
+    }
+  }
+  res.sendStatus(200);
+}
+
 async function safeLogCall(s) {
+  if (s.logged) return;
   try {
     await logCall(s);
+    s.logged = true;
     console.log(`[LOGGED] Call: ${s.callSid} → ${s.routedTo}`);
   } catch (e) {
     console.error(`[ERROR] logCall: ${e.message}`);
@@ -276,7 +319,7 @@ async function getAIResponse(s, latestInput, policyData, planData, allPlans) {
   if (policyData) {
     const daysLeft = Math.floor((new Date(policyData.coverage_end) - new Date()) / (1000 * 60 * 60 * 24));
     policyContext = `
-VERIFIED CUSTOMER:
+VERIFIED CUSTOMER (confirmed — do NOT re-confirm or re-greet):
 - Policy: ${policyData.policy_id}
 - Name: ${policyData.customer_name}
 - Vehicle: ${policyData.vehicle}
@@ -292,38 +335,32 @@ VERIFIED CUSTOMER:
   let planContext = '';
   if (planData) {
     planContext = `
-CUSTOMER PLAN DETAILS (${planData.plan_name}) — ONLY use this, never guess:
-Engine: ${planData.engine} | Transmission: ${planData.transmission} | Drivetrain: ${planData.drivetrain}
-Electrical: ${planData.electrical} | AC/Heating: ${planData.ac_heating} | Turbo: ${planData.turbo_supercharger}
-Fuel system: ${planData.fuel_system} | Cooling: ${planData.cooling_system} | Brakes: ${planData.brake_system}
-Suspension: ${planData.suspension} | Seals/Gaskets: ${planData.seals_gaskets}
-Rental car: ${planData.rental_car} | Towing: ${planData.towing} | Roadside: ${planData.roadside}
-Deductible: ${planData.deductible} | Max claim: ${planData.max_claim}`;
+CUSTOMER PLAN (${planData.plan_name}) — answer immediately from this data, never say "let me check":
+Engine:${planData.engine} | Trans:${planData.transmission} | Drivetrain:${planData.drivetrain} | Electrical:${planData.electrical}
+AC/Heat:${planData.ac_heating} | Turbo:${planData.turbo_supercharger} | Fuel:${planData.fuel_system} | Cooling:${planData.cooling_system}
+Brakes:${planData.brake_system} | Suspension:${planData.suspension} | Seals/Gaskets:${planData.seals_gaskets}
+Rental:${planData.rental_car} | Towing:${planData.towing} | Roadside:${planData.roadside}
+Deductible:${planData.deductible} | Max claim:${planData.max_claim}`;
   }
 
   let plansContext = '';
   if (allPlans && allPlans.length > 0) {
     plansContext = `
-ALL AVAILABLE PLANS (use ONLY these — do not invent others):
-${allPlans.map(p => `
-${p.plan_name} ($${p.price_monthly}/mo):
-- Vehicle age: up to ${p.max_vehicle_age} | Mileage: up to ${p.max_mileage}
-- Engine:${p.engine} | Trans:${p.transmission} | Drive:${p.drivetrain} | Elec:${p.electrical}
-- AC/Heat:${p.ac_heating} | Turbo:${p.turbo_supercharger} | Fuel:${p.fuel_system} | Cooling:${p.cooling_system}
-- Brakes:${p.brake_system} | Susp:${p.suspension} | Seals:${p.seals_gaskets}
-- Rental:${p.rental_car} | Towing:${p.towing} | Roadside:${p.roadside}
-- Deductible:${p.deductible} | Max claim:${p.max_claim}`).join('\n')}`;
+ALL AVAILABLE PLANS — only these exist, never invent others:
+${allPlans.map(p => `${p.plan_name} ($${p.price_monthly}/mo | age:${p.max_vehicle_age} | km:${p.max_mileage} | engine:${p.engine} | AC:${p.ac_heating} | seals:${p.seals_gaskets} | deduct:${p.deductible} | max:${p.max_claim})`).join('\n')}`;
   }
 
   const timeContext = s.afterHours
-    ? `AFTER HOURS — office closed. Cannot transfer. Save requests or offer voicemail.`
+    ? `AFTER HOURS — cannot transfer. Provide info, save requests, or voicemail only.`
     : `BUSINESS HOURS — can transfer to agents.`;
 
   const history = s.messages.slice(-10).map(m =>
     `${m.role === 'user' ? 'CALLER' : 'ALEX'}: ${m.content}`
   ).join('\n');
 
-  const prompt = `You are Alex, a knowledgeable virtual assistant for A-Protect Warranty (Canada).
+  const claimCollected = Object.keys(s.claimDetails || {}).length;
+
+  const prompt = `You are Alex, virtual assistant for A-Protect Warranty (Canada). Warm, professional, concise.
 
 ${timeContext}
 
@@ -335,6 +372,7 @@ SESSION:
 - Intent: ${s.intent || 'unknown'}
 - Stage: ${s.stage}
 - Identified: ${s.identified}
+- Claim details collected: ${claimCollected} fields
 ${policyContext}
 ${planContext}
 ${plansContext}
@@ -345,54 +383,41 @@ ${history}
 CALLER: "${latestInput}"
 
 STRICT RULES:
-1. NEVER say "I located", "I found your policy", "I have your account" more than once
-2. NEVER say "let me check", "one moment", "let me look that up" — ALL data is already in your prompt, answer immediately
-3. NEVER greet caller by name after the first turn
-4. NEVER repeat coverage info already stated in this conversation
-5. Keep responses concise — 3-4 sentences max. For coverage questions or plan recommendations, use up to 6 sentences to give a complete answer.
-6. When caller says "no", "that's all", "thanks", "goodbye" → action=goodbye immediately
-7. NEVER invent plan names — only use plans from ALL AVAILABLE PLANS
-8. After hours → never transfer
-9. stage must ALWAYS move forward — never go back to "greet" or "identify" once past them
-10. If you already confirmed the policy, vehicle and plan — go straight to answering questions, do NOT re-confirm
+1. NEVER say "I located", "I found your policy" — customer is already verified, just answer their question
+2. NEVER say "let me check", "one moment", "let me look that up" — ALL data is in your prompt, answer immediately
+3. NEVER greet caller by name after the first turn (only say name once at greet stage)
+4. NEVER repeat info already stated in this conversation
+5. Keep responses concise — 3-4 sentences. For coverage or plan questions use up to 6 sentences.
+6. action=goodbye when caller says: no, nope, that's all, thanks, thank you, goodbye, bye, all good, perfect, got it, done, that's it
+7. NEVER invent plan names — only plans from ALL AVAILABLE PLANS
+8. After hours: never use action=transfer
+9. Stage never goes backwards
+10. Answer coverage questions IMMEDIATELY from plan data
+
+CLAIM COLLECTION FLOW:
+- When intent=Claim and stage=claim_collect: collect these fields one at a time:
+  issue (what happened), when_started, mileage, at_shop (yes/no), symptoms
+- When all 5 fields collected → stage=confirm
+- At confirm stage: summarize collected info in 2-3 sentences, ask "Does that sound right?"
+- After caller confirms → say "I can log this request for the Claims team and they will follow up, or I can connect you now if you prefer. Which would you like?" Use action=confirm
+- After caller chooses → execute (save_request or transfer) + say ONE goodbye sentence. Never ask more questions.
+- NEVER repeat the summary more than once
 
 GOODBYE TRIGGERS — action=goodbye immediately:
-"no", "nope", "that's all", "that's it", "thanks", "thank you", "goodbye", "bye", "all good", "perfect", "got it"
-
-FLOW:
-- identify: Get policy # or last 6 VIN digits. If new client/dealer → get name + what they need
-- greet: Found policy → confirm vehicle + plan in ONE sentence, ask how you can help. Only once.
-- intent: Understand what they need
-- claim_collect: What happened, when, mileage, at shop, warning lights
-- resolve: Summarize, offer next step
+"no", "nope", "that's all", "that's it", "thanks", "thank you", "goodbye", "bye", "all good", "perfect", "got it", "done"
 
 DEPARTMENTS: Sales 101 | Claims 102 | Accounting 103 | Management 104
 
 Reply ONLY with JSON, no markdown:
-{
-  "speech": "2-3 sentences max, natural, no name after first turn",
-  "action": "collect_more",
-  "extension": null,
-  "department": null,
-  "summary": null,
-  "extracted": {
-    "name": null,
-    "reason": null,
-    "intent": null,
-    "callerType": null,
-    "dealerName": null,
-    "stage": null,
-    "claimDetails": null
-  }
-}
+{"speech":"response text","action":"collect_more","extension":null,"department":null,"summary":null,"extracted":{"name":null,"reason":null,"intent":null,"callerType":null,"dealerName":null,"stage":null,"claimDetails":null}}
 
-ACTIONS: collect_more | provide_info | transfer | voicemail | save_request | goodbye`;
+ACTIONS: collect_more | provide_info | confirm | transfer | voicemail | save_request | goodbye`;
 
   try {
     const completion = await groq.chat.completions.create({
       model: 'llama-3.3-70b-versatile',
       max_tokens: 350,
-      temperature: 0.25,
+      temperature: 0.2,
       messages: [{ role: 'user', content: prompt }],
     });
     const raw = completion.choices[0].message.content.trim().replace(/```json|```/g, '').trim();
@@ -401,7 +426,7 @@ ACTIONS: collect_more | provide_info | transfer | voicemail | save_request | goo
   } catch (err) {
     console.error(`[GROQ ERROR] ${err.message}`);
     return {
-      speech: `Sorry, could you say that again?`,
+      speech: `Could you say that again?`,
       action: 'collect_more',
       extension: null, department: null, summary: null,
       extracted: { name: null, reason: null, intent: null, callerType: null, dealerName: null, stage: null, claimDetails: null },
