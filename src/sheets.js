@@ -15,6 +15,7 @@ async function getSheets() {
   return google.sheets({ version: 'v4', auth });
 }
 
+// ── Lookup warranty policy ─────────────────────────────────────────────────
 export async function lookupPolicy(policyId) {
   try {
     const sheets = await getSheets();
@@ -25,6 +26,7 @@ export async function lookupPolicy(policyId) {
     const rows = res.data.values || [];
     const row = rows.find(r => r[0]?.toUpperCase() === policyId.toUpperCase());
     if (!row) return null;
+    const today = new Date();
     return {
       policy_id:      row[0],
       customer_name:  row[1],
@@ -36,7 +38,7 @@ export async function lookupPolicy(policyId) {
       plan_type:      row[7],
       claim_status:   row[8] || 'None',
       notes:          row[9] || '',
-      active:         new Date(row[6]) >= new Date(),
+      active:         new Date(row[6]) >= today,
     };
   } catch (e) {
     console.error('lookupPolicy error:', e.message);
@@ -44,6 +46,7 @@ export async function lookupPolicy(policyId) {
   }
 }
 
+// ── Log new call ───────────────────────────────────────────────────────────
 export async function logCall(session) {
   try {
     const sheets = await getSheets();
@@ -57,7 +60,7 @@ export async function logCall(session) {
           session.from,
           session.name || '',
           session.policyId || '',
-          session.reason || session.intent || '',
+          session.reason || '',
           session.routedTo || '',
           'Completed',
           '',
@@ -69,42 +72,12 @@ export async function logCall(session) {
   }
 }
 
-export async function logRequestToSheets(entry) {
-  try {
-    const sheets = await getSheets();
-    await sheets.spreadsheets.values.append({
-      spreadsheetId: SHEET_ID,
-      range: 'Requests!A:O',
-      valueInputOption: 'USER_ENTERED',
-      resource: {
-        values: [[
-          entry.timestamp,
-          entry.type,
-          entry.callerType,
-          entry.name,
-          entry.phone,
-          entry.policyId,
-          entry.vehicle,
-          entry.vin || '',
-          entry.department,
-          entry.summary,
-          entry.details,
-          entry.status,
-          entry.assignedTo,
-          entry.followUp,
-          entry.resolvedAt,
-        ]],
-      },
-    });
-  } catch (e) {
-    console.error('logRequestToSheets error:', e.message);
-  }
-}
-
+// ── Update call log row ────────────────────────────────────────────────────
 export async function updateCallLog(callSid, updates) {
   console.log(`updateCallLog ${callSid}:`, updates);
 }
 
+// ── Get call log for dashboard ─────────────────────────────────────────────
 export async function getCallLog() {
   try {
     const sheets = await getSheets();
@@ -129,33 +102,38 @@ export async function getCallLog() {
   }
 }
 
-export async function getRequests() {
+export async function getPlanDetails(planName) {
   try {
     const sheets = await getSheets();
     const res = await sheets.spreadsheets.values.get({
       spreadsheetId: SHEET_ID,
-      range: 'Requests!A2:O500',
+      range: 'Plans!A2:Y20',
     });
     const rows = res.data.values || [];
-    return rows.reverse().slice(0, 200).map(r => ({
-      timestamp:   r[0] || '',
-      type:        r[1] || '',
-      callerType:  r[2] || '',
-      name:        r[3] || '',
-      phone:       r[4] || '',
-      policyId:    r[5] || '',
-      vehicle:     r[6] || '',
-      vin:         r[7] || '',
-      department:  r[8] || '',
-      summary:     r[9] || '',
-      details:     r[10] || '',
-      status:      r[11] || '',
-      assignedTo:  r[12] || '',
-      followUp:    r[13] || '',
-      resolvedAt:  r[14] || '',
-    }));
+    const row = rows.find(r => r[0]?.toLowerCase() === planName?.toLowerCase());
+    if (!row) return null;
+    return {
+      plan_name:         row[0],
+      tier:              row[1],
+      engine:            row[6]  === 'Yes' ? 'Covered' : 'Not covered',
+      transmission:      row[7]  === 'Yes' ? 'Covered' : 'Not covered',
+      drivetrain:        row[8]  === 'Yes' ? 'Covered' : 'Not covered',
+      electrical:        row[9]  === 'Yes' ? 'Covered' : 'Not covered',
+      ac_heating:        row[10] === 'Yes' ? 'Covered' : 'Not covered',
+      turbo_supercharger:row[11] === 'Yes' ? 'Covered' : 'Not covered',
+      fuel_system:       row[12] === 'Yes' ? 'Covered' : 'Not covered',
+      cooling_system:    row[13] === 'Yes' ? 'Covered' : 'Not covered',
+      brake_system:      row[14] === 'Yes' ? 'Covered' : 'Not covered',
+      suspension:        row[15] === 'Yes' ? 'Covered' : 'Not covered',
+      seals_gaskets:     row[16] === 'Yes' ? 'Covered' : 'Not covered',
+      rental_car:        row[17] === 'Yes' ? 'Covered' : 'Not covered',
+      towing:            row[18] === 'Yes' ? 'Covered' : 'Not covered',
+      roadside:          row[19] === 'Yes' ? 'Covered' : 'Not covered',
+      deductible:        row[21] || '',
+      max_claim:         row[23] || '',
+    };
   } catch (e) {
-    console.error('getRequests error:', e.message);
-    return [];
+    console.error('getPlanDetails error:', e.message);
+    return null;
   }
 }
