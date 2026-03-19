@@ -1,7 +1,7 @@
 import pkg from 'twilio';
 const { twiml: TwiML } = pkg;
 import Groq from 'groq-sdk';
-import { lookupPolicy, logCall, logRequest, updateCallLog } from './sheets.js';
+import { lookupPolicy, logCall, logRequestToSheets, updateCallLog } from './sheets.js';
 import { EXTENSIONS } from './config.js';
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
