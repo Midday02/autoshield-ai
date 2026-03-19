@@ -10,7 +10,7 @@ const sessions = new Map();
 function isAfterHours() {
   const et = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' }));
   const h = et.getHours(), d = et.getDay();
-  return d === 0 || d === 6 || h < 9 || h >= 18;
+  return d === 0 || d === 6 || h < 9 || h >= 17;
 }
 
 export async function handleIncomingCall(req, res) {
@@ -24,8 +24,21 @@ export async function handleIncomingCall(req, res) {
   });
   const r = new TwiML.VoiceResponse();
   if (isAfterHours()) {
-    r.say({ voice: 'Polly.Joanna' }, AFTER_HOURS_MSG);
-    r.record({ action: `/voice/recording?callSid=${callSid}`, maxLength: 120, playBeep: true });
+    session.routedTo = 'After Hours';
+    sessions.set(callSid, session);
+    const gather = r.gather({
+      input: 'speech dtmf',
+      action: `/voice/afterhours?callSid=${callSid}`,
+      speechTimeout: 'auto',
+      timeout: 8,
+      numDigits: 1,
+    });
+    gather.say({ voice: 'Polly.Joanna' },
+      `Thank you for calling A-Protect Warranty. Our office is currently closed. 
+       Business hours are Monday to Friday, 9 AM to 5 PM Eastern Time.
+       Press 1 or say assistant to speak with our virtual assistant — available anytime for warranty status and claim updates.
+       Press 2 or say voicemail to leave a message and we will call you back next business day.`
+    );
     return res.type('text/xml').send(r.toString());
   }
   const gather = r.gather({
@@ -37,6 +50,48 @@ export async function handleIncomingCall(req, res) {
     timeout: 8,
   });
   gather.say({ voice: 'Polly.Joanna' }, GREETINGS.welcome);
+  res.type('text/xml').send(r.toString());
+}
+
+export async function handleAfterHours(req, res) {
+  const callSid = req.query.callSid || req.body.CallSid;
+  const speech = (req.body.SpeechResult || '').toLowerCase();
+  const digit = req.body.Digits || '';
+  const session = sessions.get(callSid) || {
+    callSid, from: req.body.From,
+    name: null, policyId: null, reason: null,
+    messages: [], routedTo: null,
+    startTime: new Date().toISOString(),
+  };
+  const r = new TwiML.VoiceResponse();
+  if (digit === '1' || speech.includes('assistant') || speech.includes('one') || speech.includes('status') || speech.includes('claim') || speech.includes('warranty')) {
+    session.routedTo = 'After Hours AI';
+    sessions.set(callSid, session);
+    const gather = r.gather({
+      input: 'speech',
+      action: `/voice/speech?callSid=${callSid}`,
+      speechTimeout: 'auto',
+      speechModel: 'phone_call',
+      enhanced: true,
+      timeout: 8,
+    });
+    gather.say({ voice: 'Polly.Joanna' },
+      `Of course! I am your virtual assistant and available anytime. Could I get your name and what you would like help with today?`
+    );
+  } else {
+    session.routedTo = 'Voicemail';
+    session.reason = 'After hours voicemail';
+    sessions.set(callSid, session);
+    await logCall(session);
+    r.say({ voice: 'Polly.Joanna' },
+      `No problem. Please leave your name, phone number, and a brief message after the tone. We will call you back next business day.`
+    );
+    r.record({
+      action: `/voice/recording?callSid=${callSid}`,
+      maxLength: 120,
+      playBeep: true,
+    });
+  }
   res.type('text/xml').send(r.toString());
 }
 
@@ -89,7 +144,7 @@ export async function handleRecording(req, res) {
     await updateCallLog(callSid, { recordingUrl, status: 'VM Left' });
   }
   const r = new TwiML.VoiceResponse();
-  r.say({ voice: 'Polly.Joanna' }, 'Thank you for calling AutoShield. Goodbye!');
+  r.say({ voice: 'Polly.Joanna' }, 'Thank you for calling A-Protect Warranty. Goodbye!');
   r.hangup();
   res.type('text/xml').send(r.toString());
 }
@@ -111,8 +166,9 @@ async function getAIResponse(session, latestInput) {
       policyContext = `Policy ${session.policyId} NOT found in CRM.`;
     }
   }
-  const prompt = `You are the AI phone receptionist for AutoShield Warranty (used-car warranty company, Canada).
+  const prompt = `You are the AI phone receptionist for A-Protect Warranty, a used-car warranty company in Canada.
 Collect caller name and reason, then route to correct department.
+You are available 24/7 — even after hours you can check warranty status and claim updates.
 Respond ONLY with valid JSON, no markdown, no explanation.
 
 DEPARTMENTS:
@@ -120,7 +176,7 @@ DEPARTMENTS:
 - Claims Ext 102: claim status, filing, service
 - Accounting Ext 103: billing, invoices, payments
 - Management Ext 104: escalations, complaints, appeals
-- Voicemail Ext 199: after hours, no answer
+- Voicemail Ext 199: caller requests voicemail
 
 COLLECTED:
 - Name: ${session.name || 'unknown'}
@@ -138,8 +194,10 @@ Reply ONLY with this JSON:
 
 Rules:
 - action = collect_more until you have BOTH name AND reason
-- action = transfer when you have name + reason
-- action = voicemail only if caller requests it`;
+- action = transfer when you have name + reason and know the department
+- action = voicemail only if caller explicitly requests it
+- If after hours and caller wants warranty/claim info — provide it directly in speech before asking if they need anything else
+- Never transfer to agents after hours — use voicemail instead`;
 
   try {
     const completion = await groq.chat.completions.create({
