@@ -3,130 +3,158 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>A-Protect Warranty — AI Receptionist</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<title>A-Protect Warranty — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#f8f7f4;--surface:#ffffff;--surface2:#f1efe8;
-  --text:#1a1a18;--muted:#73726c;--border:rgba(0,0,0,0.09);
-  --blue:#185FA5;--blue-bg:#E6F1FB;--blue-text:#0C447C;
-  --green:#1D9E75;--green-bg:#E1F5EE;--green-text:#085041;
-  --amber:#BA7517;--amber-bg:#FAEEDA;--amber-text:#633806;
-  --red:#A32D2D;--red-bg:#FCEBEB;--red-text:#501313;
-  --purple:#534AB7;--purple-bg:#EEEDFE;--purple-text:#26215C;
-  --gray-bg:#F1EFE8;--gray-text:#444441;
-  --r:10px;--font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+  --bg:#0f0f13;--s1:#17171d;--s2:#1e1e26;--s3:#26262f;--s4:#2e2e3a;
+  --t1:#f0f0f8;--t2:#9898b0;--t3:#5a5a72;
+  --bd:rgba(255,255,255,0.06);--bd2:rgba(255,255,255,0.1);
+  --blue:#5b8ef5;--blue-d:#0d1f3c;--blue-t:#93b8fa;
+  --green:#3ecf8e;--green-d:#0a1f14;--green-t:#6ee8b4;
+  --amber:#f5a623;--amber-d:#251800;--amber-t:#fcd07a;
+  --red:#f06060;--red-d:#220e0e;--red-t:#f9a0a0;
+  --purple:#9b7ef0;--purple-d:#160f30;--purple-t:#c4aff8;
+  --gray-d:#1e1e26;--gray-t:#7878a0;
+  --r:12px;--r2:8px;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;
 }
-body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;display:flex;min-height:100vh}
-.sidebar{width:220px;min-width:220px;background:var(--surface);border-right:0.5px solid var(--border);display:flex;flex-direction:column}
-.brand{padding:20px;border-bottom:0.5px solid var(--border)}
-.brand-icon{width:32px;height:32px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
-.brand-icon svg{width:16px;height:16px;fill:white}
-.brand-name{font-size:14px;font-weight:600}
-.brand-sub{font-size:11px;color:var(--muted)}
-.nav{padding:12px 0;flex:1}
-.nav-label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;padding:8px 16px 4px}
-.nav-item{display:flex;align-items:center;gap:9px;padding:8px 16px;cursor:pointer;font-size:13px;color:var(--muted);border-left:2px solid transparent;transition:all .12s;user-select:none}
-.nav-item:hover{background:var(--bg);color:var(--text)}
-.nav-item.active{background:var(--blue-bg);color:var(--blue-text);border-left-color:var(--blue);font-weight:500}
-.nav-item svg{width:14px;height:14px;flex-shrink:0}
-.sidebar-footer{padding:14px 16px;border-top:0.5px solid var(--border)}
-.online-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:5px}
-.sidebar-footer p{font-size:11px;color:var(--muted);line-height:1.7}
-.main{flex:1;display:flex;flex-direction:column;min-width:0}
-.topbar{background:var(--surface);border-bottom:0.5px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
-.topbar-left h1{font-size:15px;font-weight:600}
-.topbar-left p{font-size:12px;color:var(--muted);margin-top:1px}
-.topbar-right{display:flex;align-items:center;gap:10px}
-.badge{font-size:11px;font-weight:500;padding:4px 10px;border-radius:20px;white-space:nowrap}
-.badge-green{background:var(--green-bg);color:var(--green-text)}
-.badge-blue{background:var(--blue-bg);color:var(--blue-text)}
-.badge-amber{background:var(--amber-bg);color:var(--amber-text)}
-.badge-red{background:var(--red-bg);color:var(--red-text)}
-.badge-purple{background:var(--purple-bg);color:var(--purple-text)}
-.badge-gray{background:var(--gray-bg);color:var(--gray-text)}
-.refresh-btn{padding:6px 12px;background:var(--surface2);border:0.5px solid var(--border);border-radius:6px;font-size:12px;cursor:pointer;font-family:var(--font);color:var(--text)}
-.refresh-btn:hover{background:var(--border)}
-.content{flex:1;padding:20px 24px;display:flex;flex-direction:column;gap:18px;overflow-y:auto}
-.page{display:none;flex-direction:column;gap:18px}
+body{font-family:var(--font);background:var(--bg);color:var(--t1);font-size:13px;display:flex;height:100vh;overflow:hidden}
+
+.sidebar{width:210px;min-width:210px;background:var(--s1);border-right:0.5px solid var(--bd);display:flex;flex-direction:column}
+.brand{padding:16px;border-bottom:0.5px solid var(--bd);display:flex;align-items:center;gap:10px}
+.brand-icon{width:30px;height:30px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.brand-icon svg{width:14px;height:14px;fill:white}
+.brand-name{font-size:13px;font-weight:600;color:var(--t1);line-height:1.2}
+.brand-sub{font-size:10px;color:var(--t3)}
+.nav{flex:1;padding:8px 0;overflow-y:auto}
+.nav-group{margin-bottom:4px}
+.nav-sec{padding:12px 14px 4px;font-size:9px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.1em}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 14px;cursor:pointer;font-size:12px;color:var(--t2);border-left:2px solid transparent;transition:all .1s}
+.nav-item:hover{background:var(--s2);color:var(--t1)}
+.nav-item.active{background:var(--blue-d);color:var(--blue-t);border-left-color:var(--blue);font-weight:500}
+.nav-item svg{width:13px;height:13px;flex-shrink:0}
+.nav-count{margin-left:auto;font-size:10px;padding:1px 6px;border-radius:10px;background:var(--s3);color:var(--t3)}
+.nav-item.active .nav-count{background:var(--blue-d);color:var(--blue-t)}
+.nav-count.alert{background:var(--amber-d);color:var(--amber-t)}
+.sidebar-foot{padding:12px 14px;border-top:0.5px solid var(--bd)}
+.status-row{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--t3)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;flex-shrink:0}
+
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{background:var(--s1);border-bottom:0.5px solid var(--bd);padding:11px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.topbar-l h1{font-size:14px;font-weight:600}
+.topbar-l p{font-size:11px;color:var(--t3);margin-top:1px}
+.topbar-r{display:flex;align-items:center;gap:8px}
+.chip{font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px}
+.chip-green{background:var(--green-d);color:var(--green-t)}
+.chip-blue{background:var(--blue-d);color:var(--blue-t)}
+.chip-amber{background:var(--amber-d);color:var(--amber-t)}
+.chip-red{background:var(--red-d);color:var(--red-t)}
+.chip-purple{background:var(--purple-d);color:var(--purple-t)}
+.chip-gray{background:var(--s3);color:var(--t2)}
+.btn{padding:5px 11px;background:var(--s2);border:0.5px solid var(--bd2);border-radius:var(--r2);font-size:11px;cursor:pointer;font-family:var(--font);color:var(--t2);transition:all .1s}
+.btn:hover{background:var(--s3);color:var(--t1)}
+
+.content{flex:1;padding:16px 20px;overflow-y:auto;display:flex;flex-direction:column;gap:16px}
+.page{display:none;flex-direction:column;gap:16px}
 .page.active{display:flex}
-.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.metric{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);padding:16px}
-.metric-label{font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
-.metric-value{font-size:26px;font-weight:600;line-height:1;margin-bottom:4px}
-.metric-sub{font-size:11px;color:var(--muted)}
-.metric-sub.up{color:var(--green)}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.card{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);overflow:hidden}
-.card-head{padding:13px 16px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between}
-.card-title{font-size:13px;font-weight:600}
-.card-body{padding:16px}
-.table-wrap{overflow-x:auto}
+
+.metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.metric{background:var(--s2);border:0.5px solid var(--bd);border-radius:var(--r);padding:14px 16px;cursor:default;transition:border .1s}
+.metric:hover{border-color:var(--bd2)}
+.metric-label{font-size:10px;font-weight:500;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.metric-value{font-size:24px;font-weight:600;line-height:1;margin-bottom:3px}
+.metric-sub{font-size:11px;color:var(--t3)}
+.metric-sub.up{color:var(--green-t)}
+.metric-sub.warn{color:var(--amber-t)}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+
+.card{background:var(--s1);border:0.5px solid var(--bd);border-radius:var(--r);overflow:hidden}
+.card-head{padding:12px 16px;border-bottom:0.5px solid var(--bd);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.card-title{font-size:12px;font-weight:600;color:var(--t1)}
+.card-body{padding:14px 16px}
+.card-body.np{padding:0}
+
 table{width:100%;border-collapse:collapse;font-size:12px}
-th{text-align:left;padding:7px 12px;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;border-bottom:0.5px solid var(--border);background:var(--bg);white-space:nowrap}
-td{padding:10px 12px;border-bottom:0.5px solid var(--border);vertical-align:middle}
+th{text-align:left;padding:7px 14px;font-size:10px;font-weight:500;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;border-bottom:0.5px solid var(--bd);background:var(--s2);white-space:nowrap}
+td{padding:10px 14px;border-bottom:0.5px solid var(--bd);vertical-align:middle}
 tr:last-child td{border-bottom:none}
-tr.clickable{cursor:pointer;transition:background .1s}
-tr.clickable:hover td{background:var(--blue-bg)}
+tr.row-click{cursor:pointer;transition:background .1s}
+tr.row-click:hover td{background:var(--s2)}
 .mono{font-family:var(--mono);font-size:11px}
-.text-muted{color:var(--muted)}
-.detail-panel{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--r);overflow:hidden;display:none}
-.detail-panel.open{display:block}
-.detail-header{background:var(--blue);color:white;padding:14px 18px;display:flex;align-items:center;justify-content:space-between}
-.detail-header h3{font-size:14px;font-weight:500}
-.detail-close{background:rgba(255,255,255,0.2);border:none;color:white;width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:14px}
-.detail-body{padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.detail-field{display:flex;flex-direction:column;gap:3px}
-.detail-field label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
-.detail-field span{font-size:13px;font-weight:500}
-.search-row{display:flex;gap:8px;margin-bottom:16px}
-.search-input{flex:1;padding:9px 12px;border:0.5px solid var(--border);border-radius:7px;background:var(--bg);font-family:var(--mono);font-size:13px;color:var(--text);outline:none}
+.dim{color:var(--t3)}
+
+.req-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;padding:14px 16px}
+.req-card{background:var(--s2);border:0.5px solid var(--bd);border-radius:var(--r);padding:14px;cursor:pointer;transition:all .1s;position:relative}
+.req-card:hover{border-color:var(--bd2);background:var(--s3)}
+.req-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;gap:8px}
+.req-card-name{font-size:13px;font-weight:600;color:var(--t1)}
+.req-card-sub{font-size:11px;color:var(--t3);margin-top:2px}
+.req-card-body{font-size:12px;color:var(--t2);line-height:1.5;margin-bottom:10px}
+.req-card-foot{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.req-card-meta{font-size:11px;color:var(--t3);font-family:var(--mono)}
+.req-type-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.req-type-icon svg{width:15px;height:15px}
+
+.bar-row{display:flex;flex-direction:column;gap:9px}
+.bar-item{display:flex;flex-direction:column;gap:3px}
+.bar-top{display:flex;justify-content:space-between;font-size:11px}
+.bar-track{background:var(--s3);border-radius:3px;height:5px}
+.bar-fill{height:5px;border-radius:3px;transition:width .5s ease}
+
+.search-input{padding:7px 11px;background:var(--s2);border:0.5px solid var(--bd);border-radius:var(--r2);font-size:12px;color:var(--t1);outline:none;font-family:var(--font);width:200px;transition:border .1s}
 .search-input:focus{border-color:var(--blue)}
-.search-btn{padding:9px 16px;background:var(--blue);color:white;border:none;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font)}
-.policy-card{background:var(--bg);border-radius:8px;padding:16px;display:none}
-.policy-card.show{display:block}
-.policy-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
-.policy-name{font-size:16px;font-weight:600}
-.policy-id{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:2px}
-.policy-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:0.5px solid var(--border);font-size:13px}
+.search-input::placeholder{color:var(--t3)}
+select.filter-sel{padding:6px 10px;background:var(--s2);border:0.5px solid var(--bd);border-radius:var(--r2);font-size:11px;color:var(--t2);outline:none;font-family:var(--font);cursor:pointer}
+select.filter-sel:focus{border-color:var(--blue)}
+
+.detail-panel{border-top:0.5px solid var(--bd);display:none}
+.detail-panel.open{display:block}
+.detail-top{background:var(--blue-d);padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+.detail-top h3{font-size:13px;font-weight:500;color:var(--blue-t)}
+.detail-close{background:rgba(255,255,255,0.1);border:none;color:var(--blue-t);width:22px;height:22px;border-radius:50%;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:14px 16px}
+.detail-field label{font-size:10px;font-weight:500;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:3px}
+.detail-field span{font-size:12px;font-weight:500;color:var(--t1)}
+
+.policy-result{background:var(--s2);border-radius:var(--r);padding:14px;margin-top:12px;display:none}
+.policy-result.show{display:block}
+.policy-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.policy-name{font-size:15px;font-weight:600}
+.policy-id{font-size:11px;color:var(--t3);font-family:var(--mono);margin-top:2px}
+.policy-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:0.5px solid var(--bd);font-size:12px}
 .policy-row:last-child{border-bottom:none}
-.policy-label{color:var(--muted);font-size:12px}
+.policy-label{color:var(--t3)}
 .policy-val{font-weight:500}
-.quick-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;padding-top:14px;border-top:0.5px solid var(--border)}
-.pill-btn{font-family:var(--mono);font-size:11px;padding:5px 10px;border:0.5px solid var(--border);border-radius:5px;background:var(--surface);cursor:pointer;color:var(--blue-text)}
-.pill-btn:hover{background:var(--blue-bg)}
-.dir-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:0.5px solid var(--border)}
+
+.dir-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:0.5px solid var(--bd)}
 .dir-item:last-child{border-bottom:none}
-.avatar{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
+.dir-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
 .dir-info{flex:1}
-.dir-name{font-size:13px;font-weight:500}
-.dir-role{font-size:11px;color:var(--muted)}
-.dir-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
-.ext-tag{font-family:var(--mono);font-size:11px;color:var(--blue-text)}
-.avail{width:7px;height:7px;border-radius:50%}
-.avail-green{background:var(--green)}
-.avail-amber{background:var(--amber)}
-.avail-red{background:var(--red)}
-.bar-row{display:flex;flex-direction:column;gap:10px}
-.bar-item{display:flex;flex-direction:column;gap:4px}
-.bar-top{display:flex;justify-content:space-between;font-size:12px}
-.bar-track{background:var(--bg);border-radius:3px;height:6px}
-.bar-fill{height:6px;border-radius:3px;transition:width .6s ease}
-.rm-item{display:flex;gap:12px;padding:11px 0;border-bottom:0.5px solid var(--border)}
+.dir-name{font-size:12px;font-weight:500}
+.dir-role{font-size:11px;color:var(--t3)}
+.dir-right{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.ext{font-family:var(--mono);font-size:11px;color:var(--blue-t)}
+.avail{width:6px;height:6px;border-radius:50%}
+.av-g{background:var(--green)}.av-a{background:var(--amber)}.av-r{background:var(--red)}
+
+.rm-item{display:flex;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--bd)}
 .rm-item:last-child{border-bottom:none}
-.rm-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.rm-icon svg{width:15px;height:15px}
-.rm-title{font-size:13px;font-weight:500;margin-bottom:2px}
-.rm-desc{font-size:12px;color:var(--muted);line-height:1.5}
-.rm-phase{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-top:4px;color:var(--muted)}
-.empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:13px}
-.loading{text-align:center;padding:30px;color:var(--muted);font-size:13px}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-.blink{animation:blink 1.4s ease-in-out infinite}
-::-webkit-scrollbar{width:4px;height:4px}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-.toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:white;padding:10px 16px;border-radius:8px;font-size:13px;opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none;z-index:100}
+.rm-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rm-icon svg{width:14px;height:14px}
+.rm-title{font-size:12px;font-weight:500;margin-bottom:2px}
+.rm-desc{font-size:11px;color:var(--t3);line-height:1.5}
+.rm-phase{font-size:10px;font-weight:500;margin-top:3px;color:var(--t3);text-transform:uppercase;letter-spacing:.05em}
+
+.empty{text-align:center;padding:40px;color:var(--t3);font-size:12px}
+.loading{text-align:center;padding:30px;color:var(--t3);font-size:12px}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-thumb{background:var(--s4);border-radius:2px}
+.toast{position:fixed;bottom:20px;right:20px;background:var(--s3);color:var(--t1);border:0.5px solid var(--bd2);padding:9px 14px;border-radius:var(--r2);font-size:12px;opacity:0;transform:translateY(6px);transition:all .2s;pointer-events:none;z-index:999}
 .toast.show{opacity:1;transform:translateY(0)}
 </style>
 </head>
@@ -134,74 +162,90 @@ tr.clickable:hover td{background:var(--blue-bg)}
 <aside class="sidebar">
   <div class="brand">
     <div class="brand-icon"><svg viewBox="0 0 24 24"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.95.684l1.5 4.5a1 1 0 01-.23 1.02L9.2 10.52a11.05 11.05 0 005.28 5.28l1.316-1.296a1 1 0 011.02-.23l4.5 1.5a1 1 0 01.684.95V19a2 2 0 01-2 2h-1C9.82 21 3 14.18 3 6V5z"/></svg></div>
-    <div class="brand-name">A-Protect Warranty</div>
-    <div class="brand-sub">AI Receptionist Console</div>
+    <div><div class="brand-name">A-Protect Warranty</div><div class="brand-sub">AI Receptionist</div></div>
   </div>
   <nav class="nav">
-    <div class="nav-label">Operations</div>
-    <div class="nav-item active" onclick="showPage('overview',this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Overview
+    <div class="nav-group">
+      <div class="nav-sec">Operations</div>
+      <div class="nav-item active" onclick="showPage('overview',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Overview
+      </div>
+      <div class="nav-item" onclick="showPage('requests',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12h6m-6 4h6M5 8h14M5 16h4"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg>
+        Requests
+        <span class="nav-count alert" id="nav-req-count">0</span>
+      </div>
+      <div class="nav-item" onclick="showPage('calls',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+        Call Log
+        <span class="nav-count" id="nav-call-count">0</span>
+      </div>
+      <div class="nav-item" onclick="showPage('crm',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        Warranty Lookup
+      </div>
     </div>
-    <div class="nav-item" onclick="showPage('calls',this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>Call Log
-    </div>
-    <div class="nav-item" onclick="showPage('crm',this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Warranty Lookup
-    </div>
-    <div class="nav-label" style="margin-top:8px">Setup</div>
-    <div class="nav-item" onclick="showPage('directory',this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Directory
-    </div>
-    <div class="nav-item" onclick="showPage('roadmap',this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>Roadmap
+    <div class="nav-group">
+      <div class="nav-sec">Setup</div>
+      <div class="nav-item" onclick="showPage('directory',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        Directory
+      </div>
+      <div class="nav-item" onclick="showPage('roadmap',this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        Roadmap
+      </div>
     </div>
   </nav>
-  <div class="sidebar-footer">
-    <p><span class="online-dot"></span>AI Receptionist Active</p>
-    <p style="padding-left:12px">Twilio · Groq · Sheets</p>
+  <div class="sidebar-foot">
+    <div class="status-row"><div class="live-dot"></div>AI Active · +1 (249) 421-4816</div>
+    <div class="status-row" style="margin-top:4px;padding-left:12px">Groq · Twilio · Sheets</div>
   </div>
 </aside>
 <div class="main">
   <div class="topbar">
-    <div class="topbar-left">
-      <h1 id="page-title">Overview</h1>
-      <p id="page-sub">Live stats — refreshes every 60 seconds</p>
-    </div>
-    <div class="topbar-right">
-      <span class="badge badge-green"><span class="blink">●</span> System Online</span>
-      <span class="badge badge-gray">+1 (249) 421-4816</span>
-      <button class="refresh-btn" onclick="refreshAll()">↻ Refresh</button>
+    <div class="topbar-l"><h1 id="page-title">Overview</h1><p id="page-sub">Live stats — auto-refreshes every 60s</p></div>
+    <div class="topbar-r">
+      <span class="chip chip-green"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);margin-right:5px;animation:pulse 2s infinite"></span>Online</span>
+      <span class="chip chip-gray" id="time-chip">—</span>
+      <button class="btn" onclick="refreshAll()">↻ Refresh</button>
     </div>
   </div>
   <div class="content">
+
     <!-- OVERVIEW -->
     <div class="page active" id="page-overview">
       <div class="metrics">
-        <div class="metric"><div class="metric-label">Calls Today</div><div class="metric-value" id="m-total" style="color:var(--blue)">—</div><div class="metric-sub" id="m-total-sub">loading...</div></div>
-        <div class="metric"><div class="metric-label">Routed Correctly</div><div class="metric-value" id="m-accuracy" style="color:var(--green)">—</div><div class="metric-sub up">AI routing</div></div>
-        <div class="metric"><div class="metric-label">Transferred</div><div class="metric-value" id="m-routed" style="color:var(--purple)">—</div><div class="metric-sub">to agents</div></div>
-        <div class="metric"><div class="metric-label">Voicemail</div><div class="metric-value" id="m-vm" style="color:var(--amber)">—</div><div class="metric-sub">after hours</div></div>
+        <div class="metric"><div class="metric-label">Calls Today</div><div class="metric-value" id="m-total" style="color:var(--blue-t)">—</div><div class="metric-sub" id="m-total-sub">loading</div></div>
+        <div class="metric"><div class="metric-label">Routed</div><div class="metric-value" id="m-routed" style="color:var(--green-t)">—</div><div class="metric-sub up">to agents</div></div>
+        <div class="metric"><div class="metric-label">Accuracy</div><div class="metric-value" id="m-accuracy" style="color:var(--purple-t)">—</div><div class="metric-sub">AI routing</div></div>
+        <div class="metric"><div class="metric-label">Voicemail</div><div class="metric-value" id="m-vm" style="color:var(--amber-t)">—</div><div class="metric-sub">after hours</div></div>
+        <div class="metric"><div class="metric-label">New Requests</div><div class="metric-value" id="m-req" style="color:var(--red-t)">—</div><div class="metric-sub warn">need attention</div></div>
       </div>
-      <div class="grid-2">
+      <div class="grid2">
         <div class="card">
-          <div class="card-head"><span class="card-title">Recent Calls</span><span class="badge badge-gray" id="recent-count">—</span></div>
-          <div class="card-body" style="padding:0"><div id="recent-calls"><div class="loading">Loading...</div></div></div>
+          <div class="card-head"><span class="card-title">Recent Requests</span><span class="chip chip-gray" id="ov-req-count">—</span></div>
+          <div id="ov-requests" class="req-grid" style="padding:12px"></div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;flex-direction:column;gap:14px">
           <div class="card">
             <div class="card-head"><span class="card-title">Routing Breakdown</span></div>
-            <div class="card-body"><div class="bar-row" id="breakdown-bars"><div class="loading">Loading...</div></div></div>
+            <div class="card-body"><div class="bar-row" id="breakdown"></div></div>
           </div>
           <div class="card">
-            <div class="card-head"><span class="card-title">System Info</span></div>
+            <div class="card-head"><span class="card-title">Request Types</span></div>
+            <div class="card-body"><div class="bar-row" id="req-breakdown"></div></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><span class="card-title">System</span></div>
             <div class="card-body">
-              <div style="display:flex;flex-direction:column;gap:8px;font-size:12px">
-                <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Company</span><span style="font-weight:500">A-Protect Warranty</span></div>
-                <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Phone</span><span style="font-weight:500;font-family:var(--mono)">+1 (249) 421-4816</span></div>
-                <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">AI engine</span><span style="font-weight:500">Groq · LLaMA 3.3 70B</span></div>
-                <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">CRM</span><span style="font-weight:500">Google Sheets</span></div>
-                <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">Hours</span><span style="font-weight:500">Mon–Fri 9am–5pm ET</span></div>
-                <div style="display:flex;justify-content:space-between"><span style="color:var(--muted)">After hours</span><span style="font-weight:500">Auto voicemail</span></div>
+              <div style="display:flex;flex-direction:column;gap:7px;font-size:12px">
+                <div style="display:flex;justify-content:space-between"><span class="dim">Company</span><span>A-Protect Warranty</span></div>
+                <div style="display:flex;justify-content:space-between"><span class="dim">Phone</span><span class="mono">+1 (249) 421-4816</span></div>
+                <div style="display:flex;justify-content:space-between"><span class="dim">AI</span><span>Groq LLaMA 3.3 70B</span></div>
+                <div style="display:flex;justify-content:space-between"><span class="dim">Hours</span><span>Mon–Fri 9am–5pm ET</span></div>
+                <div style="display:flex;justify-content:space-between"><span class="dim">After hours</span><span>AI self-serve + VM</span></div>
               </div>
             </div>
           </div>
@@ -209,26 +253,69 @@ tr.clickable:hover td{background:var(--blue-bg)}
       </div>
     </div>
 
+    <!-- REQUESTS -->
+    <div class="page" id="page-requests">
+      <div class="card">
+        <div class="card-head">
+          <span class="card-title">All Requests</span>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <input class="search-input" id="req-search" placeholder="Search name, policy, summary..." oninput="filterRequests()">
+            <select class="filter-sel" id="req-type-filter" onchange="filterRequests()">
+              <option value="">All types</option>
+              <option>Claim</option>
+              <option>Status Check</option>
+              <option>New Policy</option>
+              <option>Billing</option>
+              <option>Escalation</option>
+              <option>Dealer</option>
+              <option>Other</option>
+            </select>
+            <select class="filter-sel" id="req-status-filter" onchange="filterRequests()">
+              <option value="">All status</option>
+              <option>New</option>
+              <option>In Progress</option>
+              <option>Done</option>
+              <option>Escalated</option>
+            </select>
+            <select class="filter-sel" id="req-dept-filter" onchange="filterRequests()">
+              <option value="">All depts</option>
+              <option>Sales</option>
+              <option>Claims</option>
+              <option>Accounting</option>
+              <option>Management</option>
+            </select>
+            <span class="chip chip-gray" id="req-count">0</span>
+          </div>
+        </div>
+        <div id="req-cards" class="req-grid"></div>
+      </div>
+    </div>
+
     <!-- CALL LOG -->
     <div class="page" id="page-calls">
       <div class="card">
         <div class="card-head">
-          <span class="card-title">All Calls</span>
+          <span class="card-title">Call Log</span>
           <div style="display:flex;gap:8px;align-items:center">
-            <input type="text" id="call-search" placeholder="Search name, policy, reason..." style="padding:5px 10px;border:0.5px solid var(--border);border-radius:5px;font-size:12px;background:var(--bg);outline:none;width:220px;font-family:var(--font)" oninput="filterCalls()">
-            <span class="badge badge-gray" id="call-count">0 calls</span>
+            <input class="search-input" id="call-search" placeholder="Search..." oninput="filterCalls()">
+            <select class="filter-sel" id="call-date-filter" onchange="filterCalls()">
+              <option value="">All dates</option>
+              <option value="today">Today</option>
+              <option value="week">This week</option>
+            </select>
+            <span class="chip chip-gray" id="call-count">0</span>
           </div>
         </div>
-        <div id="call-detail-panel" class="detail-panel">
-          <div class="detail-header">
-            <h3 id="detail-title">Call Details</h3>
-            <button class="detail-close" onclick="closeDetail()">✕</button>
+        <div id="call-detail" class="detail-panel">
+          <div class="detail-top">
+            <h3 id="call-detail-title">Call Details</h3>
+            <button class="detail-close" onclick="document.getElementById('call-detail').classList.remove('open')">✕</button>
           </div>
-          <div class="detail-body" id="detail-body"></div>
+          <div class="detail-grid" id="call-detail-body"></div>
         </div>
-        <div class="table-wrap">
+        <div style="overflow-x:auto">
           <table>
-            <thead><tr><th>Time</th><th>Caller</th><th>Policy #</th><th>Reason</th><th>Routed to</th><th>Status</th></tr></thead>
+            <thead><tr><th>Time</th><th>Caller</th><th>Policy</th><th>Intent</th><th>Routed to</th><th>Status</th></tr></thead>
             <tbody id="calls-tbody"><tr><td colspan="6" class="loading">Loading...</td></tr></tbody>
           </table>
         </div>
@@ -237,60 +324,49 @@ tr.clickable:hover td{background:var(--blue-bg)}
 
     <!-- CRM -->
     <div class="page" id="page-crm">
-      <div class="grid-2">
+      <div class="grid2">
         <div class="card">
           <div class="card-head"><span class="card-title">Warranty Lookup</span></div>
           <div class="card-body">
-            <div class="search-row">
-              <input class="search-input" id="policy-input" placeholder="Policy # e.g. W482031" maxlength="7" onkeydown="if(event.key==='Enter')lookupCRM()">
-              <button class="search-btn" onclick="lookupCRM()">Search</button>
+            <div style="display:flex;gap:8px">
+              <input class="search-input" id="policy-input" placeholder="W482031" maxlength="7" style="width:140px" onkeydown="if(event.key==='Enter')lookupCRM()">
+              <button class="btn" onclick="lookupCRM()" style="background:var(--blue);color:white;border-color:var(--blue)">Search</button>
             </div>
-            <div id="crm-error" style="display:none;font-size:13px;color:var(--red-text);padding:8px 0"></div>
-            <div class="policy-card" id="policy-card">
+            <div id="crm-err" style="display:none;font-size:12px;color:var(--red-t);margin-top:8px"></div>
+            <div class="policy-result" id="policy-result">
               <div class="policy-top">
                 <div><div class="policy-name" id="p-name"></div><div class="policy-id" id="p-id"></div></div>
-                <div id="p-status-badge"></div>
+                <div id="p-badge"></div>
               </div>
-              <div style="border-top:0.5px solid var(--border);padding-top:12px;display:flex;flex-direction:column">
-                <div class="policy-row"><span class="policy-label">Vehicle</span><span class="policy-val" id="p-vehicle"></span></div>
-                <div class="policy-row"><span class="policy-label">VIN</span><span class="policy-val mono" id="p-vin"></span></div>
-                <div class="policy-row"><span class="policy-label">Coverage start</span><span class="policy-val" id="p-start"></span></div>
-                <div class="policy-row"><span class="policy-label">Coverage end</span><span class="policy-val" id="p-end"></span></div>
-                <div class="policy-row"><span class="policy-label">Plan</span><span class="policy-val" id="p-plan"></span></div>
-                <div class="policy-row" style="border:none"><span class="policy-label">Claim status</span><span id="p-claim"></span></div>
-              </div>
+              <div id="p-fields"></div>
             </div>
-            <div class="quick-pills">
-              <div style="font-size:11px;color:var(--muted);font-weight:500;width:100%;margin-bottom:4px">Quick access</div>
-              <button class="pill-btn" onclick="setPolicy('W482031')">W482031</button>
-              <button class="pill-btn" onclick="setPolicy('W291847')">W291847</button>
-              <button class="pill-btn" onclick="setPolicy('W774412')">W774412</button>
-              <button class="pill-btn" onclick="setPolicy('W110055')">W110055</button>
+            <div style="margin-top:14px;padding-top:12px;border-top:0.5px solid var(--bd)">
+              <div style="font-size:10px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Quick access</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px">
+                <button class="btn" onclick="setPolicy('W482031')">W482031</button>
+                <button class="btn" onclick="setPolicy('W291847')">W291847</button>
+                <button class="btn" onclick="setPolicy('W774412')">W774412</button>
+                <button class="btn" onclick="setPolicy('W110055')">W110055</button>
+              </div>
             </div>
           </div>
         </div>
         <div class="card">
-          <div class="card-head"><span class="card-title">Google Sheets Structure</span></div>
+          <div class="card-head"><span class="card-title">Sheet Structure</span></div>
           <div class="card-body">
-            <p style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.6">Tab must be named <span style="font-family:var(--mono);background:var(--bg);padding:1px 5px;border-radius:3px">Warranties</span> — AI reads it live on every call.</p>
-            <div style="border:0.5px solid var(--border);border-radius:8px;overflow:hidden">
+            <p style="font-size:11px;color:var(--t3);margin-bottom:12px;line-height:1.6">Tab <span class="mono" style="background:var(--s3);padding:1px 5px;border-radius:3px">Warranties</span> — AI reads live on every call</p>
+            <div style="border:0.5px solid var(--bd);border-radius:var(--r2);overflow:hidden">
               <table>
                 <thead><tr><th>Column</th><th>Example</th></tr></thead>
                 <tbody>
-                  <tr><td class="mono" style="color:var(--blue-text)">policy_id</td><td class="mono">W482031</td></tr>
-                  <tr><td class="mono" style="color:var(--blue-text)">customer_name</td><td>Marcus Webb</td></tr>
-                  <tr><td class="mono" style="color:var(--blue-text)">phone</td><td class="mono">+14168824491</td></tr>
-                  <tr><td class="mono" style="color:var(--blue-text)">vehicle</td><td>2019 Ford F-150</td></tr>
-                  <tr><td class="mono" style="color:var(--blue-text)">vin</td><td class="mono">1FTEW1EP7KFA</td></tr>
-                  <tr><td class="mono" style="color:var(--blue-text)">coverage_start</td><td>2024-03-01</td></tr>
-                  <tr><td class="mono" style="color:var(--blue-text)">coverage_end</td><td>2027-03-01</td></tr>
-                  <tr><td class="mono" style="color:var(--blue-text)">plan_type</td><td>Powertrain Plus</td></tr>
-                  <tr><td class="mono" style="color:var(--blue-text)">claim_status</td><td><span class="badge badge-amber" style="font-size:10px">WIP</span></td></tr>
+                  <tr><td class="mono" style="color:var(--blue-t)">policy_id</td><td class="mono">W482031</td></tr>
+                  <tr><td class="mono" style="color:var(--blue-t)">customer_name</td><td>Marcus Webb</td></tr>
+                  <tr><td class="mono" style="color:var(--blue-t)">vehicle</td><td>2019 Ford F-150</td></tr>
+                  <tr><td class="mono" style="color:var(--blue-t)">coverage_end</td><td>2027-03-01</td></tr>
+                  <tr><td class="mono" style="color:var(--blue-t)">plan_type</td><td>Powertrain Plus</td></tr>
+                  <tr><td class="mono" style="color:var(--blue-t)">claim_status</td><td><span class="chip chip-amber" style="font-size:10px">WIP</span></td></tr>
                 </tbody>
               </table>
-            </div>
-            <div style="margin-top:12px;padding:10px 12px;background:var(--blue-bg);border-radius:6px;font-size:12px;color:var(--blue-text);line-height:1.6">
-              <strong>Claim values:</strong> Accepted · WIP · Done · Rejected · None
             </div>
           </div>
         </div>
@@ -299,30 +375,34 @@ tr.clickable:hover td{background:var(--blue-bg)}
 
     <!-- DIRECTORY -->
     <div class="page" id="page-directory">
-      <div class="grid-2">
+      <div class="grid2">
         <div class="card">
-          <div class="card-head"><span class="card-title">Extensions & Agents</span></div>
+          <div class="card-head"><span class="card-title">Extensions</span></div>
           <div class="card-body">
-            <div class="dir-item"><div class="avatar" style="background:var(--green-bg);color:var(--green-text)">SA</div><div class="dir-info"><div class="dir-name">Sales</div><div class="dir-role">New quotes · Pricing · Renewals</div></div><div class="dir-right"><span class="ext-tag">Ext. 101</span><div class="avail avail-green"></div></div></div>
-            <div class="dir-item"><div class="avatar" style="background:var(--blue-bg);color:var(--blue-text)">CL</div><div class="dir-info"><div class="dir-name">Claims / Service</div><div class="dir-role">Filing claims · Status updates</div></div><div class="dir-right"><span class="ext-tag">Ext. 102</span><div class="avail avail-green"></div></div></div>
-            <div class="dir-item"><div class="avatar" style="background:var(--purple-bg);color:var(--purple-text)">AC</div><div class="dir-info"><div class="dir-name">Accounting</div><div class="dir-role">Billing · Invoices · Payments</div></div><div class="dir-right"><span class="ext-tag">Ext. 103</span><div class="avail avail-amber"></div></div></div>
-            <div class="dir-item"><div class="avatar" style="background:var(--amber-bg);color:var(--amber-text)">MG</div><div class="dir-info"><div class="dir-name">Management</div><div class="dir-role">Escalations · Complaints · Appeals</div></div><div class="dir-right"><span class="ext-tag">Ext. 104</span><div class="avail avail-red"></div></div></div>
-            <div class="dir-item" style="border:none"><div class="avatar" style="background:var(--gray-bg);color:var(--gray-text)">VM</div><div class="dir-info"><div class="dir-name">Voicemail</div><div class="dir-role">After hours · Agent unavailable</div></div><div class="dir-right"><span class="ext-tag">Ext. 199</span><div class="avail avail-green"></div></div></div>
+            <div class="dir-item"><div class="dir-av" style="background:var(--green-d);color:var(--green-t)">SA</div><div class="dir-info"><div class="dir-name">Sales</div><div class="dir-role">New quotes · Pricing · Renewals</div></div><div class="dir-right"><span class="ext">Ext. 101</span><div class="avail av-g"></div></div></div>
+            <div class="dir-item"><div class="dir-av" style="background:var(--blue-d);color:var(--blue-t)">CL</div><div class="dir-info"><div class="dir-name">Claims / Service</div><div class="dir-role">Filing · Status updates</div></div><div class="dir-right"><span class="ext">Ext. 102</span><div class="avail av-g"></div></div></div>
+            <div class="dir-item"><div class="dir-av" style="background:var(--purple-d);color:var(--purple-t)">AC</div><div class="dir-info"><div class="dir-name">Accounting</div><div class="dir-role">Billing · Invoices · Payments</div></div><div class="dir-right"><span class="ext">Ext. 103</span><div class="avail av-a"></div></div></div>
+            <div class="dir-item"><div class="dir-av" style="background:var(--amber-d);color:var(--amber-t)">MG</div><div class="dir-info"><div class="dir-name">Management</div><div class="dir-role">Escalations · Complaints</div></div><div class="dir-right"><span class="ext">Ext. 104</span><div class="avail av-r"></div></div></div>
+            <div class="dir-item" style="border:none"><div class="dir-av" style="background:var(--s3);color:var(--t3)">VM</div><div class="dir-info"><div class="dir-name">Voicemail</div><div class="dir-role">After hours · Unavailable</div></div><div class="dir-right"><span class="ext">Ext. 199</span><div class="avail av-g"></div></div></div>
           </div>
         </div>
         <div class="card">
-          <div class="card-head"><span class="card-title">AI Routing Rules</span></div>
-          <div class="card-body" style="display:flex;flex-direction:column;gap:12px">
-            <p style="font-size:12px;color:var(--muted);line-height:1.6">AI collects name and reason before routing. Uses Groq LLaMA 3.3 for intent detection.</p>
-            <div style="display:flex;flex-direction:column;gap:8px">
-              <div style="display:flex;gap:8px;align-items:center;font-size:12px"><span class="badge badge-green" style="min-width:90px;text-align:center">Sales 101</span><span style="color:var(--muted)">Quotes, pricing, renewals</span></div>
-              <div style="display:flex;gap:8px;align-items:center;font-size:12px"><span class="badge badge-blue" style="min-width:90px;text-align:center">Claims 102</span><span style="color:var(--muted)">Status, filing, service</span></div>
-              <div style="display:flex;gap:8px;align-items:center;font-size:12px"><span class="badge badge-purple" style="min-width:90px;text-align:center">Accounting 103</span><span style="color:var(--muted)">Billing, invoices, payments</span></div>
-              <div style="display:flex;gap:8px;align-items:center;font-size:12px"><span class="badge badge-amber" style="min-width:90px;text-align:center">Mgmt 104</span><span style="color:var(--muted)">Escalations, complaints</span></div>
-              <div style="display:flex;gap:8px;align-items:center;font-size:12px"><span class="badge badge-gray" style="min-width:90px;text-align:center">VM 199</span><span style="color:var(--muted)">After hours, unavailable</span></div>
+          <div class="card-head"><span class="card-title">AI Flow</span></div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+            <div style="background:var(--s2);border-radius:var(--r2);padding:12px;font-size:12px;line-height:1.7;color:var(--t2)">
+              <strong style="color:var(--t1);display:block;margin-bottom:4px">Caller identification</strong>
+              Asks for policy # or last 6 VIN + name. Finds customer record, greets by name, confirms vehicle and plan.
             </div>
-            <div style="background:var(--green-bg);border-radius:6px;padding:10px 12px;font-size:12px;color:var(--green-text);line-height:1.5"><strong>Policy lookup:</strong> If caller says W###### — AI checks CRM and reads back warranty status before routing.</div>
-            <div style="background:var(--amber-bg);border-radius:6px;padding:10px 12px;font-size:12px;color:var(--amber-text);line-height:1.5"><strong>After hours:</strong> Before 9am or after 5pm ET, weekends → auto voicemail.</div>
+            <div style="background:var(--s2);border-radius:var(--r2);padding:12px;font-size:12px;line-height:1.7;color:var(--t2)">
+              <strong style="color:var(--t1);display:block;margin-bottom:4px">Intent detection</strong>
+              Claim · Coverage question · New policy · Billing · Dealer inquiry · Escalation
+            </div>
+            <div style="background:var(--green-d);border-radius:var(--r2);padding:10px 12px;font-size:12px;color:var(--green-t);line-height:1.5">
+              <strong>Business hours:</strong> Transfers to correct extension after collecting details.
+            </div>
+            <div style="background:var(--amber-d);border-radius:var(--r2);padding:10px 12px;font-size:12px;color:var(--amber-t);line-height:1.5">
+              <strong>After hours:</strong> Answers questions directly, saves structured request, or directs to voicemail.
+            </div>
           </div>
         </div>
       </div>
@@ -330,30 +410,30 @@ tr.clickable:hover td{background:var(--blue-bg)}
 
     <!-- ROADMAP -->
     <div class="page" id="page-roadmap">
-      <div class="grid-2">
+      <div class="grid2">
         <div class="card">
-          <div class="card-head"><span class="card-title">MVP — Live Now</span><span class="badge badge-green">Phase 1</span></div>
+          <div class="card-head"><span class="card-title">Phase 1 — Live</span><span class="chip chip-green">Done</span></div>
           <div class="card-body">
-            <div class="rm-item"><div class="rm-icon" style="background:var(--green-bg)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg></div><div><div class="rm-title">AI phone answering 24/7</div><div class="rm-desc">Answers every call, collects name and reason via natural conversation using Groq LLaMA.</div><div class="rm-phase">✓ Live</div></div></div>
-            <div class="rm-item"><div class="rm-icon" style="background:var(--green-bg)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div><div class="rm-title">Smart routing to extensions</div><div class="rm-desc">Routes to Sales, Claims, Accounting, Management, or Voicemail based on intent.</div><div class="rm-phase">✓ Live</div></div></div>
-            <div class="rm-item"><div class="rm-icon" style="background:var(--green-bg)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div><div><div class="rm-title">Live Google Sheets CRM</div><div class="rm-desc">Reads coverage status, claim status, vehicle info during every call.</div><div class="rm-phase">✓ Live</div></div></div>
-            <div class="rm-item" style="border:none"><div class="rm-icon" style="background:var(--green-bg)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg></div><div><div class="rm-title">Call log & dashboard</div><div class="rm-desc">Every call logged to Sheets. Live dashboard with stats and click-through details.</div><div class="rm-phase">✓ Live</div></div></div>
+            <div class="rm-item"><div class="rm-icon" style="background:var(--green-d)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green-t)" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg></div><div><div class="rm-title">AI phone answering 24/7</div><div class="rm-desc">Identifies clients by policy or VIN, reads warranty and claim status, full conversation flow.</div><div class="rm-phase">✓ Live</div></div></div>
+            <div class="rm-item"><div class="rm-icon" style="background:var(--green-d)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green-t)" stroke-width="2"><path d="M9 12h6m-6 4h6M5 8h14"/><rect x="2" y="4" width="20" height="16" rx="2"/></svg></div><div><div class="rm-title">Structured request logging</div><div class="rm-desc">Every call creates a request card — claim info, new policy inquiries, dealer contacts, all categorized.</div><div class="rm-phase">✓ Live</div></div></div>
+            <div class="rm-item"><div class="rm-icon" style="background:var(--green-d)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green-t)" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div><div><div class="rm-title">Live Google Sheets CRM</div><div class="rm-desc">Reads warranty data and writes call logs + requests in real time.</div><div class="rm-phase">✓ Live</div></div></div>
+            <div class="rm-item" style="border:none"><div class="rm-icon" style="background:var(--green-d)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green-t)" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg></div><div><div class="rm-title">This dashboard</div><div class="rm-desc">Live request cards, call log, warranty lookup, routing breakdown.</div><div class="rm-phase">✓ Live</div></div></div>
           </div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;flex-direction:column;gap:14px">
           <div class="card">
-            <div class="card-head"><span class="card-title">Phase 2 — Quick Wins</span><span class="badge badge-amber">Next</span></div>
+            <div class="card-head"><span class="card-title">Phase 2</span><span class="chip chip-amber">Next</span></div>
             <div class="card-body">
-              <div class="rm-item"><div class="rm-icon" style="background:var(--amber-bg)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><div><div class="rm-title">SMS follow-up after every call</div><div class="rm-desc">Auto-text caller with reference # and next steps. Reduces repeat calls ~30%.</div></div></div>
-              <div class="rm-item"><div class="rm-icon" style="background:var(--amber-bg)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div><div><div class="rm-title">Callback scheduling</div><div class="rm-desc">AI offers callback slot that syncs to Google Calendar when agent is unavailable.</div></div></div>
-              <div class="rm-item" style="border:none"><div class="rm-icon" style="background:var(--amber-bg)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div><div><div class="rm-title">AI claim intake</div><div class="rm-desc">AI collects all claim info over the phone and creates a draft record in CRM.</div></div></div>
+              <div class="rm-item"><div class="rm-icon" style="background:var(--amber-d)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--amber-t)" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><div><div class="rm-title">SMS follow-up</div><div class="rm-desc">Auto-text after every call with request reference number and next steps.</div></div></div>
+              <div class="rm-item"><div class="rm-icon" style="background:var(--amber-d)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--amber-t)" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div><div><div class="rm-title">Callback scheduling</div><div class="rm-desc">AI offers callback slots synced to Google Calendar.</div></div></div>
+              <div class="rm-item" style="border:none"><div class="rm-icon" style="background:var(--amber-d)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--amber-t)" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div><div><div class="rm-title">Request status updates</div><div class="rm-desc">Agents update request status in dashboard — client gets notified.</div></div></div>
             </div>
           </div>
           <div class="card">
-            <div class="card-head"><span class="card-title">Phase 3 — Scale</span><span class="badge badge-purple">Future</span></div>
+            <div class="card-head"><span class="card-title">Phase 3</span><span class="chip chip-purple">Future</span></div>
             <div class="card-body">
-              <div class="rm-item"><div class="rm-icon" style="background:var(--purple-bg)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><div><div class="rm-title">Proactive renewal outreach</div><div class="rm-desc">AI calls customers 30/60/90 days before expiry. Automated retention.</div></div></div>
-              <div class="rm-item" style="border:none"><div class="rm-icon" style="background:var(--purple-bg)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div><div><div class="rm-title">Real CRM + French support</div><div class="rm-desc">Migrate to HubSpot/Salesforce. Add French for Quebec market.</div></div></div>
+              <div class="rm-item"><div class="rm-icon" style="background:var(--purple-d)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--purple-t)" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><div><div class="rm-title">Proactive renewal outreach</div><div class="rm-desc">AI calls clients 30/60/90 days before expiry. Automated retention.</div></div></div>
+              <div class="rm-item" style="border:none"><div class="rm-icon" style="background:var(--purple-d)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--purple-t)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div><div><div class="rm-title">HubSpot / Salesforce + French</div><div class="rm-desc">Real CRM migration. French language support for Quebec.</div></div></div>
             </div>
           </div>
         </div>
@@ -363,107 +443,244 @@ tr.clickable:hover td{background:var(--blue-bg)}
   </div>
 </div>
 <div class="toast" id="toast"></div>
-  <script>
-let allCalls=[],filteredCalls=[];
-const pages={overview:{title:'Overview',sub:'Live stats — refreshes every 60 seconds'},calls:{title:'Call Log',sub:'All incoming calls — click a row for details'},crm:{title:'Warranty Lookup',sub:'Search policies from Google Sheets CRM'},directory:{title:'Directory & Routing',sub:'Extensions and AI routing logic'},roadmap:{title:'Feature Roadmap',sub:'MVP scope and future enhancements'}};
+<script>
+const pages={overview:{t:'Overview',s:'Live stats — auto-refreshes every 60s'},requests:{t:'Requests',s:'All incoming requests — click a card for details'},calls:{t:'Call Log',s:'All calls — click a row for details'},crm:{t:'Warranty Lookup',s:'Search policies from Google Sheets'},directory:{t:'Directory & Routing',s:'Extensions and AI flow'},roadmap:{t:'Feature Roadmap',s:'MVP scope and next steps'}};
+let allCalls=[],allRequests=[],filtCalls=[],filtRequests=[];
 
 function showPage(id,el){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
   el.classList.add('active');
-  document.getElementById('page-title').textContent=pages[id].title;
-  document.getElementById('page-sub').textContent=pages[id].sub;
+  document.getElementById('page-title').textContent=pages[id].t;
+  document.getElementById('page-sub').textContent=pages[id].s;
   if(id==='calls')renderCallsTable();
+  if(id==='requests')renderReqCards('req-cards',filtRequests);
 }
 
-function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)}
+
+function updateClock(){
+  const et=new Date(new Date().toLocaleString('en-US',{timeZone:'America/Toronto'}));
+  const h=et.getHours(),open=h>=9&&h<17&&et.getDay()>0&&et.getDay()<6;
+  document.getElementById('time-chip').textContent=et.toLocaleTimeString('en-CA',{hour:'2-digit',minute:'2-digit',hour12:false})+' ET';
+  document.getElementById('time-chip').className='chip '+(open?'chip-green':'chip-amber');
+}
+setInterval(updateClock,1000);updateClock();
 
 async function fetchStats(){
   try{
-    const r=await fetch('/api/stats'),d=await r.json();
+    const d=await(await fetch('/api/stats')).json();
     document.getElementById('m-total').textContent=d.total;
-    document.getElementById('m-accuracy').textContent=d.accuracy+'%';
     document.getElementById('m-routed').textContent=d.routed;
+    document.getElementById('m-accuracy').textContent=d.accuracy+'%';
     document.getElementById('m-vm').textContent=d.voicemail;
+    document.getElementById('m-req').textContent=d.new_requests;
     document.getElementById('m-total-sub').textContent='calls today';
-  }catch{['m-total','m-accuracy','m-routed','m-vm'].forEach(id=>document.getElementById(id).textContent='—')}
+    document.getElementById('nav-req-count').textContent=d.new_requests;
+    if(d.new_requests>0)document.getElementById('nav-req-count').className='nav-count alert';
+  }catch{['m-total','m-routed','m-accuracy','m-vm','m-req'].forEach(id=>document.getElementById(id).textContent='—')}
 }
 
 async function fetchCalls(){
   try{
-    const r=await fetch('/api/calls');
-    allCalls=await r.json();
-    filteredCalls=[...allCalls];
+    allCalls=await(await fetch('/api/calls')).json();
+    filtCalls=[...allCalls];
+    document.getElementById('nav-call-count').textContent=allCalls.length;
+    document.getElementById('call-count').textContent=allCalls.length+' calls';
     renderRecentCalls();
     renderBreakdown();
-    document.getElementById('recent-count').textContent=allCalls.length+' total';
-    document.getElementById('call-count').textContent=allCalls.length+' calls';
-  }catch{document.getElementById('recent-calls').innerHTML='<div class="empty">Could not load call data</div>'}
+  }catch{document.getElementById('breakdown').innerHTML='<div class="empty">No data</div>'}
+}
+
+async function fetchRequests(){
+  try{
+    allRequests=await(await fetch('/api/requests')).json();
+    filtRequests=[...allRequests];
+    document.getElementById('req-count').textContent=allRequests.length+' requests';
+    document.getElementById('ov-req-count').textContent=allRequests.length;
+    renderReqCards('ov-requests',allRequests.slice(0,4));
+    renderReqBreakdown();
+  }catch{}
 }
 
 function renderRecentCalls(){
-  const el=document.getElementById('recent-calls');
-  const recent=allCalls.slice(0,6);
-  if(!recent.length){el.innerHTML='<div class="empty">No calls yet today</div>';return}
-  el.innerHTML='<table><thead><tr><th>Time</th><th>Caller</th><th>Routed to</th><th>Status</th></tr></thead><tbody>'+
-    recent.map(c=>`<tr class="clickable" onclick='showCallDetail(${JSON.stringify(c).replace(/'/g,"\\'")})'><td class="mono text-muted">${formatTime(c.timestamp)}</td><td><div style="font-size:13px;font-weight:500">${c.name||'Unknown'}</div><div class="mono text-muted" style="font-size:10px">${c.phone}</div></td><td>${routeBadge(c.routed_to)}</td><td>${statusBadge(c.status)}</td></tr>`).join('')+'</tbody></table>';
-}
-
-function renderBreakdown(){
+  const el=document.getElementById('breakdown');
   const counts={Claims:0,Sales:0,Accounting:0,Management:0,Voicemail:0};
   allCalls.forEach(c=>{
-    const rt=c.routed_to||'';
-    if(rt.includes('Claims'))counts.Claims++;
-    else if(rt.includes('Sales'))counts.Sales++;
-    else if(rt.includes('Account'))counts.Accounting++;
-    else if(rt.includes('Management'))counts.Management++;
+    const r=c.routed_to||'';
+    if(r.includes('Claims'))counts.Claims++;
+    else if(r.includes('Sales'))counts.Sales++;
+    else if(r.includes('Account'))counts.Accounting++;
+    else if(r.includes('Management'))counts.Management++;
     else counts.Voicemail++;
   });
   const total=allCalls.length||1;
-  const colors={Claims:'var(--blue)',Sales:'var(--green)',Accounting:'var(--purple)',Management:'var(--amber)',Voicemail:'#888'};
-  document.getElementById('breakdown-bars').innerHTML=Object.entries(counts).map(([k,v])=>`
-    <div class="bar-item"><div class="bar-top"><span>${k}</span><span style="font-weight:500;color:${colors[k]}">${v} calls</span></div>
-    <div class="bar-track"><div class="bar-fill" style="background:${colors[k]};width:${Math.round(v/total*100)}%"></div></div></div>`).join('');
+  const colors={Claims:'var(--blue)',Sales:'var(--green)',Accounting:'var(--purple)',Management:'var(--amber)',Voicemail:'var(--t3)'};
+  el.innerHTML=Object.entries(counts).map(([k,v])=>`
+    <div class="bar-item">
+      <div class="bar-top"><span style="color:var(--t2)">${k}</span><span style="color:${colors[k]};font-weight:500">${v}</span></div>
+      <div class="bar-track"><div class="bar-fill" style="background:${colors[k]};width:${Math.round(v/total*100)}%"></div></div>
+    </div>`).join('');
+}
+
+function renderReqBreakdown(){
+  const el=document.getElementById('req-breakdown');
+  const counts={};
+  allRequests.forEach(r=>{const t=r.type||'Other';counts[t]=(counts[t]||0)+1});
+  const total=allRequests.length||1;
+  const colors={'Claim':'var(--blue)','New Policy':'var(--green)','Status Check':'var(--purple)','Billing':'var(--amber)','Escalation':'var(--red)','Dealer':'var(--blue-t)','Other':'var(--t3)'};
+  el.innerHTML=Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`
+    <div class="bar-item">
+      <div class="bar-top"><span style="color:var(--t2)">${k}</span><span style="color:${colors[k]||'var(--t2)'};font-weight:500">${v}</span></div>
+      <div class="bar-track"><div class="bar-fill" style="background:${colors[k]||'var(--t3)'};width:${Math.round(v/total*100)}%"></div></div>
+    </div>`).join('');
+}
+
+const typeColors={Claim:'var(--blue-d)',typeText:{Claim:'var(--blue-t)'}};
+const typeIcons={
+  Claim:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M12 18v-6M9 15h6"/></svg>`,
+  'New Policy':`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+  'Status Check':`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>`,
+  Billing:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>`,
+  Escalation:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
+  Dealer:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>`,
+};
+const typeBg={Claim:'var(--blue-d)',`New Policy`:'var(--green-d)','Status Check':'var(--purple-d)',Billing:'var(--amber-d)',Escalation:'var(--red-d)',Dealer:'var(--blue-d)',Other:'var(--s3)'};
+const typeCol={Claim:'var(--blue-t)','New Policy':'var(--green-t)','Status Check':'var(--purple-t)',Billing:'var(--amber-t)',Escalation:'var(--red-t)',Dealer:'var(--blue-t)',Other:'var(--t3)'};
+const statusChip={New:'chip-amber','In Progress':'chip-blue',Done:'chip-green',Escalated:'chip-red'};
+
+function renderReqCards(containerId, reqs){
+  const el=document.getElementById(containerId);
+  if(!reqs||!reqs.length){el.innerHTML='<div class="empty">No requests yet</div>';return}
+  el.innerHTML=reqs.map(r=>{
+    const bg=typeBg[r.type]||'var(--s3)';
+    const col=typeCol[r.type]||'var(--t2)';
+    const icon=typeIcons[r.type]||typeIcons.Claim;
+    const sc=statusChip[r.status]||'chip-gray';
+    const details=parseDetails(r.details);
+    return `<div class="req-card" onclick='showReqDetail(${JSON.stringify(r).replace(/'/g,"&#39;")})'>
+      <div class="req-card-top">
+        <div>
+          <div class="req-card-name">${r.name||'Unknown caller'}</div>
+          <div class="req-card-sub">${r.vehicle||r.policyId||r.phone||'—'}</div>
+        </div>
+        <div class="req-type-icon" style="background:${bg};color:${col}">${icon}</div>
+      </div>
+      <div class="req-card-body">${r.summary||'No summary available'}</div>
+      ${details?`<div style="font-size:11px;color:var(--t3);margin-bottom:8px;line-height:1.5">${details}</div>`:''}
+      <div class="req-card-foot">
+        <span class="chip ${sc}" style="font-size:10px">${r.status||'New'}</span>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span class="chip chip-gray" style="font-size:10px">${r.type||'Other'}</span>
+          <span class="req-card-meta">${formatTime(r.timestamp)}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function parseDetails(raw){
+  if(!raw||raw==='{}')return'';
+  try{
+    const d=JSON.parse(raw);
+    return Object.entries(d).filter(([,v])=>v).map(([k,v])=>`<span style="color:var(--t3)">${k.replace(/_/g,' ')}:</span> ${v}`).join(' · ');
+  }catch{return raw}
+}
+
+function showReqDetail(r){
+  if(typeof r==='string')r=JSON.parse(r);
+  const details=r.details&&r.details!=='{}'?parseDetails(r.details):'—';
+  const html=`
+    <div style="padding:14px 16px;background:var(--s2);border-top:0.5px solid var(--bd)">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div><div style="font-size:10px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Caller</div><div style="font-size:13px;font-weight:500">${r.name||'—'}</div></div>
+        <div><div style="font-size:10px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Phone</div><div class="mono" style="font-size:12px">${r.phone||'—'}</div></div>
+        <div><div style="font-size:10px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Policy</div><div class="mono" style="font-size:12px;color:var(--blue-t)">${r.policyId||'—'}</div></div>
+        <div><div style="font-size:10px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Vehicle</div><div style="font-size:12px">${r.vehicle||'—'}</div></div>
+        <div><div style="font-size:10px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Type</div><div style="font-size:12px">${r.type||'—'}</div></div>
+        <div><div style="font-size:10px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Department</div><div style="font-size:12px">${r.department||'—'}</div></div>
+      </div>
+      <div style="margin-bottom:10px"><div style="font-size:10px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Summary</div><div style="font-size:12px;color:var(--t2);line-height:1.6">${r.summary||'—'}</div></div>
+      ${details!=='—'?`<div><div style="font-size:10px;color:var(--t3);font-weight:500;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Details</div><div style="font-size:11px;color:var(--t3);line-height:1.7">${details}</div></div>`:''}
+    </div>`;
+  const existing=document.getElementById('req-detail-'+r.timestamp?.replace(/\W/g,''));
+  if(existing){existing.remove();return}
+  const cards=document.getElementById('req-cards');
+  const div=document.createElement('div');
+  div.id='req-detail-'+(r.timestamp?.replace(/\W/g,'')||'x');
+  div.style.gridColumn='1/-1';
+  div.innerHTML=html;
+  const allCards=[...cards.querySelectorAll('.req-card')];
+  const clicked=allCards.find(c=>c.textContent.includes(r.name||''));
+  if(clicked)clicked.after(div);else cards.appendChild(div);
+}
+
+function filterRequests(){
+  const q=document.getElementById('req-search').value.toLowerCase();
+  const type=document.getElementById('req-type-filter').value;
+  const status=document.getElementById('req-status-filter').value;
+  const dept=document.getElementById('req-dept-filter').value;
+  filtRequests=allRequests.filter(r=>
+    (!q||(r.name||'').toLowerCase().includes(q)||(r.summary||'').toLowerCase().includes(q)||(r.policyId||'').toLowerCase().includes(q)||(r.vehicle||'').toLowerCase().includes(q))&&
+    (!type||r.type===type)&&
+    (!status||r.status===status)&&
+    (!dept||(r.department||'').includes(dept))
+  );
+  document.getElementById('req-count').textContent=filtRequests.length+' requests';
+  renderReqCards('req-cards',filtRequests);
 }
 
 function renderCallsTable(){
   const tbody=document.getElementById('calls-tbody');
-  if(!filteredCalls.length){tbody.innerHTML='<tr><td colspan="6" class="empty">No calls found</td></tr>';return}
-  tbody.innerHTML=filteredCalls.map(c=>`<tr class="clickable" onclick='showCallDetail(${JSON.stringify(c).replace(/'/g,"\\'")})'><td class="mono text-muted" style="white-space:nowrap">${formatTime(c.timestamp)}</td><td><div style="font-weight:500">${c.name||'Unknown'}</div><div class="mono text-muted" style="font-size:10px">${c.phone}</div></td><td class="mono" style="color:var(--blue-text)">${c.policy_id||'—'}</td><td style="color:var(--muted);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.reason||'—'}</td><td>${routeBadge(c.routed_to)}</td><td>${statusBadge(c.status)}</td></tr>`).join('');
+  if(!filtCalls.length){tbody.innerHTML='<tr><td colspan="6" class="empty">No calls</td></tr>';return}
+  tbody.innerHTML=filtCalls.map(c=>`
+    <tr class="row-click" onclick='showCallDetail(${JSON.stringify(c).replace(/'/g,"&#39;")})'>
+      <td class="mono dim">${formatTime(c.timestamp)}</td>
+      <td><div style="font-weight:500">${c.name||'Unknown'}</div><div class="mono dim" style="font-size:10px">${c.phone}</div></td>
+      <td class="mono" style="color:var(--blue-t)">${c.policy_id||'—'}</td>
+      <td style="color:var(--t2);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.reason||'—'}</td>
+      <td>${routeChip(c.routed_to)}</td>
+      <td>${statusChipHtml(c.status)}</td>
+    </tr>`).join('');
 }
 
 function filterCalls(){
   const q=document.getElementById('call-search').value.toLowerCase();
-  filteredCalls=allCalls.filter(c=>(c.name||'').toLowerCase().includes(q)||(c.phone||'').includes(q)||(c.policy_id||'').toLowerCase().includes(q)||(c.reason||'').toLowerCase().includes(q)||(c.routed_to||'').toLowerCase().includes(q));
-  document.getElementById('call-count').textContent=filteredCalls.length+' calls';
+  const df=document.getElementById('call-date-filter').value;
+  const today=new Date().toISOString().slice(0,10);
+  const weekAgo=new Date(Date.now()-7*864e5).toISOString().slice(0,10);
+  filtCalls=allCalls.filter(c=>{
+    const match=!q||(c.name||'').toLowerCase().includes(q)||(c.phone||'').includes(q)||(c.policy_id||'').toLowerCase().includes(q)||(c.reason||'').toLowerCase().includes(q);
+    const dateMatch=!df||(df==='today'&&c.timestamp?.startsWith(today))||(df==='week'&&c.timestamp>=weekAgo);
+    return match&&dateMatch;
+  });
+  document.getElementById('call-count').textContent=filtCalls.length+' calls';
   renderCallsTable();
 }
 
 function showCallDetail(c){
   if(typeof c==='string')c=JSON.parse(c);
-  document.getElementById('detail-title').textContent=(c.name||'Unknown')+' — '+formatTime(c.timestamp);
-  document.getElementById('detail-body').innerHTML=`
-    <div class="detail-field"><label>Caller name</label><span>${c.name||'—'}</span></div>
+  document.getElementById('call-detail-title').textContent=(c.name||'Unknown')+' · '+formatTime(c.timestamp);
+  document.getElementById('call-detail-body').innerHTML=`
+    <div class="detail-field"><label>Name</label><span>${c.name||'—'}</span></div>
     <div class="detail-field"><label>Phone</label><span class="mono">${c.phone||'—'}</span></div>
-    <div class="detail-field"><label>Policy #</label><span class="mono" style="color:var(--blue-text)">${c.policy_id||'—'}</span></div>
+    <div class="detail-field"><label>Policy #</label><span class="mono" style="color:var(--blue-t)">${c.policy_id||'—'}</span></div>
     <div class="detail-field"><label>Reason</label><span>${c.reason||'—'}</span></div>
     <div class="detail-field"><label>Routed to</label><span>${c.routed_to||'—'}</span></div>
     <div class="detail-field"><label>Status</label><span>${c.status||'—'}</span></div>
     <div class="detail-field"><label>Time</label><span>${c.timestamp||'—'}</span></div>
-    <div class="detail-field"><label>Recording</label><span>${c.recording?'<a href="'+c.recording+'" target="_blank" style="color:var(--blue)">Play</a>':'—'}</span></div>`;
-  document.getElementById('call-detail-panel').classList.add('open');
+    <div class="detail-field"><label>Recording</label><span>${c.recording?'<a href="'+c.recording+'" target="_blank" style="color:var(--blue-t)">Play</a>':'—'}</span></div>`;
+  document.getElementById('call-detail').classList.add('open');
 }
 
-function closeDetail(){document.getElementById('call-detail-panel').classList.remove('open')}
-
-const claimColors={Accepted:'badge-green',WIP:'badge-amber',Done:'badge-blue',Rejected:'badge-red',None:'badge-gray'};
+const claimColors={Accepted:'chip-green',WIP:'chip-amber',Done:'chip-blue',Rejected:'chip-red',None:'chip-gray'};
 
 async function lookupCRM(){
   const val=document.getElementById('policy-input').value.trim().toUpperCase();
-  const err=document.getElementById('crm-error');
-  const card=document.getElementById('policy-card');
-  err.style.display='none';card.classList.remove('show');
+  const err=document.getElementById('crm-err');
+  const res=document.getElementById('policy-result');
+  err.style.display='none';res.classList.remove('show');
   if(!val.match(/^W\d{6}$/)){err.textContent='Format: W + 6 digits e.g. W482031';err.style.display='block';return}
   try{
     const r=await fetch('/api/warranty/'+val);
@@ -471,14 +688,14 @@ async function lookupCRM(){
     const d=await r.json();
     document.getElementById('p-name').textContent=d.customer_name;
     document.getElementById('p-id').textContent=d.policy_id;
-    document.getElementById('p-vehicle').textContent=d.vehicle;
-    document.getElementById('p-vin').textContent=d.vin||'—';
-    document.getElementById('p-start').textContent=d.coverage_start;
-    document.getElementById('p-end').textContent=d.coverage_end;
-    document.getElementById('p-plan').textContent=d.plan_type;
-    document.getElementById('p-status-badge').innerHTML=`<span class="badge ${d.active?'badge-green':'badge-red'}">${d.active?'Active':'Expired'}</span>`;
-    document.getElementById('p-claim').innerHTML=`<span class="badge ${claimColors[d.claim_status]||'badge-gray'}">${d.claim_status==='WIP'?'In Progress':d.claim_status}</span>`;
-    card.classList.add('show');
+    document.getElementById('p-badge').innerHTML=`<span class="chip ${d.active?'chip-green':'chip-red'}">${d.active?'Active':'Expired'}</span>`;
+    document.getElementById('p-fields').innerHTML=`
+      <div class="policy-row"><span class="policy-label">Vehicle</span><span class="policy-val">${d.vehicle}</span></div>
+      <div class="policy-row"><span class="policy-label">VIN</span><span class="policy-val mono">${d.vin||'—'}</span></div>
+      <div class="policy-row"><span class="policy-label">Coverage</span><span class="policy-val">${d.coverage_start} → ${d.coverage_end}</span></div>
+      <div class="policy-row"><span class="policy-label">Plan</span><span class="policy-val">${d.plan_type}</span></div>
+      <div class="policy-row" style="border:none"><span class="policy-label">Claim</span><span><span class="chip ${claimColors[d.claim_status]||'chip-gray'}" style="font-size:11px">${d.claim_status==='WIP'?'In Progress':d.claim_status}</span></span></div>`;
+    res.classList.add('show');
   }catch{err.textContent='Could not reach server.';err.style.display='block'}
 }
 
@@ -486,29 +703,29 @@ function setPolicy(p){document.getElementById('policy-input').value=p;lookupCRM(
 
 function formatTime(ts){
   if(!ts)return'—';
-  try{return new Date(ts).toLocaleTimeString('en-CA',{hour:'2-digit',minute:'2-digit',hour12:false})}
-  catch{return ts.slice(11,16)||ts}
+  try{return new Date(ts).toLocaleString('en-CA',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false})}
+  catch{return ts.slice(0,16)||ts}
 }
 
-function routeBadge(rt){
-  if(!rt)return'<span class="text-muted">—</span>';
-  if(rt.includes('Sales'))return`<span class="badge badge-green" style="font-size:11px">${rt}</span>`;
-  if(rt.includes('Claims'))return`<span class="badge badge-blue" style="font-size:11px">${rt}</span>`;
-  if(rt.includes('Account'))return`<span class="badge badge-purple" style="font-size:11px">${rt}</span>`;
-  if(rt.includes('Management'))return`<span class="badge badge-amber" style="font-size:11px">${rt}</span>`;
-  return`<span class="badge badge-gray" style="font-size:11px">${rt}</span>`;
+function routeChip(rt){
+  if(!rt)return'<span class="dim">—</span>';
+  if(rt.includes('Sales'))return`<span class="chip chip-green" style="font-size:10px">${rt}</span>`;
+  if(rt.includes('Claims'))return`<span class="chip chip-blue" style="font-size:10px">${rt}</span>`;
+  if(rt.includes('Account'))return`<span class="chip chip-purple" style="font-size:10px">${rt}</span>`;
+  if(rt.includes('Management'))return`<span class="chip chip-amber" style="font-size:10px">${rt}</span>`;
+  return`<span class="chip chip-gray" style="font-size:10px">${rt}</span>`;
 }
 
-function statusBadge(s){
+function statusChipHtml(s){
   if(!s)return'—';
-  if(s==='Completed')return`<span class="badge badge-gray" style="font-size:11px">Completed</span>`;
-  if(s==='VM Left')return`<span class="badge badge-amber" style="font-size:11px">VM Left</span>`;
-  return`<span class="badge badge-gray" style="font-size:11px">${s}</span>`;
+  if(s==='Completed')return`<span class="chip chip-gray" style="font-size:10px">Completed</span>`;
+  if(s==='VM Left')return`<span class="chip chip-amber" style="font-size:10px">VM Left</span>`;
+  return`<span class="chip chip-gray" style="font-size:10px">${s}</span>`;
 }
 
 async function refreshAll(){
   toast('Refreshing...');
-  await Promise.all([fetchStats(),fetchCalls()]);
+  await Promise.all([fetchStats(),fetchCalls(),fetchRequests()]);
   toast('Updated ✓');
 }
 
