@@ -23,7 +23,8 @@ export async function handleIncomingCall(req, res) {
     startTime: new Date().toISOString(),
   });
   const r = new TwiML.VoiceResponse();
-  if (isAfterHours()) {
+if (isAfterHours()) {
+    const session = sessions.get(callSid);
     session.routedTo = 'After Hours';
     sessions.set(callSid, session);
     const gather = r.gather({
