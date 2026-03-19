@@ -2,7 +2,7 @@ import express from 'express';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import { handleIncomingCall, handleUserSpeech, handleRecording } from './callHandler.js';
-import { lookupPolicy, getCallLog } from './sheets.js';
+import { lookupPolicy, getCallLog, getRequests } from './sheets.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -20,6 +20,11 @@ app.get('/api/calls', async (req, res) => {
   catch { res.json([]); }
 });
 
+app.get('/api/requests', async (req, res) => {
+  try { res.json(await getRequests()); }
+  catch { res.json([]); }
+});
+
 app.get('/api/warranty/:id', async (req, res) => {
   try {
     const policy = await lookupPolicy(req.params.id.toUpperCase());
@@ -30,17 +35,20 @@ app.get('/api/warranty/:id', async (req, res) => {
 
 app.get('/api/stats', async (req, res) => {
   try {
-    const calls = await getCallLog();
+    const [calls, requests] = await Promise.all([getCallLog(), getRequests()]);
     const today = new Date().toISOString().slice(0, 10);
     const todayCalls = calls.filter(c => c.timestamp?.startsWith(today));
-    const routed = todayCalls.filter(c => c.routed_to && c.routed_to !== 'Voicemail');
+    const routed = todayCalls.filter(c => c.routed_to && !c.routed_to.includes('Voicemail'));
+    const newRequests = requests.filter(r => r.status === 'New');
     res.json({
       total: todayCalls.length,
       routed: routed.length,
       voicemail: todayCalls.length - routed.length,
       accuracy: todayCalls.length ? Math.round((routed.length / todayCalls.length) * 100) : 0,
+      new_requests: newRequests.length,
+      total_requests: requests.length,
     });
-  } catch { res.json({ total: 0, routed: 0, voicemail: 0, accuracy: 0 }); }
+  } catch { res.json({ total: 0, routed: 0, voicemail: 0, accuracy: 0, new_requests: 0, total_requests: 0 }); }
 });
 
 app.get('*', (req, res) => {
