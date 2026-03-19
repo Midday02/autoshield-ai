@@ -18,7 +18,6 @@ async function getSheets() {
 function parseRow(row) {
   return {
     plan_name:          row[0]  || '',
-    tier:               row[1]  || '',
     price_monthly:      row[2]  || '',
     price_annual:       row[3]  || '',
     max_vehicle_age:    row[4]  || '',
