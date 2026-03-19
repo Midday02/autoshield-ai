@@ -2,7 +2,7 @@ import express from 'express';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import { handleIncomingCall, handleUserSpeech, handleRecording } from './callHandler.js';
-import { lookupPolicy, getCallLog, getRequests } from './sheets.js';
+import { lookupPolicy, getCallLog, getRequests, updateRequestStatus } from './sheets.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -25,6 +25,19 @@ app.get('/api/requests', async (req, res) => {
   catch { res.json([]); }
 });
 
+app.patch('/api/requests/:row/status', async (req, res) => {
+  try {
+    const row = parseInt(req.params.row);
+    const { status } = req.body;
+    const valid = ['New','In Progress','Done','Escalated'];
+    if (!valid.includes(status)) return res.status(400).json({ error: 'Invalid status' });
+    await updateRequestStatus(row, status);
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 app.get('/api/warranty/:id', async (req, res) => {
   try {
     const policy = await lookupPolicy(req.params.id.toUpperCase());
@@ -39,13 +52,13 @@ app.get('/api/stats', async (req, res) => {
     const today = new Date().toISOString().slice(0, 10);
     const todayCalls = calls.filter(c => c.timestamp?.startsWith(today));
     const routed = todayCalls.filter(c => c.routed_to && !c.routed_to.includes('Voicemail'));
-    const newRequests = requests.filter(r => r.status === 'New');
+    const newReqs = requests.filter(r => r.status === 'New');
     res.json({
       total: todayCalls.length,
       routed: routed.length,
       voicemail: todayCalls.length - routed.length,
       accuracy: todayCalls.length ? Math.round((routed.length / todayCalls.length) * 100) : 0,
-      new_requests: newRequests.length,
+      new_requests: newReqs.length,
       total_requests: requests.length,
     });
   } catch { res.json({ total: 0, routed: 0, voicemail: 0, accuracy: 0, new_requests: 0, total_requests: 0 }); }
