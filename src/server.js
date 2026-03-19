@@ -1,7 +1,7 @@
 import express from 'express';
 import { fileURLToPath } from 'url';
 import path from 'path';
-import { handleIncomingCall, handleUserSpeech, handleRecording, handleAfterHours } from './callHandler.js';
+import { handleIncomingCall, handleUserSpeech, handleRecording } from './callHandler.js';
 import { lookupPolicy, getCallLog } from './sheets.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -14,7 +14,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.post('/voice/incoming', handleIncomingCall);
 app.post('/voice/speech',   handleUserSpeech);
 app.post('/voice/recording', handleRecording);
-app.post('/voice/afterhours', handleAfterHours);
 
 app.get('/api/calls', async (req, res) => {
   try { res.json(await getCallLog()); }
@@ -49,4 +48,4 @@ app.get('*', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`AutoShield AI running on port ${PORT}`));
+app.listen(PORT, () => console.log(`A-Protect AI running on port ${PORT}`));
