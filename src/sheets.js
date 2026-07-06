@@ -185,6 +185,23 @@ export async function logRequestToSheets(entry) {
   }
 }
 
+export async function logSecurityEvent(entry) {
+  try {
+    const sheets = await getSheets();
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: SHEET_ID,
+      range: 'Security!A:D',
+      valueInputOption: 'USER_ENTERED',
+      resource: {
+        values: [[entry.timestamp, entry.phone, entry.policyId, entry.reason]],
+      },
+    });
+    console.log(`[SECURITY LOG] ${entry.phone} — ${entry.reason}`);
+  } catch (e) {
+    console.error('logSecurityEvent error:', e.message);
+  }
+}
+
 export async function updateCallLog(callSid, updates) {
   console.log(`updateCallLog ${callSid}:`, updates);
 }

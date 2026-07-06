@@ -1,12 +1,24 @@
 import pkg from 'twilio';
 const { twiml: TwiML } = pkg;
 import Groq from 'groq-sdk';
-import { lookupPolicy, lookupPolicyByVin, logCall, logRequestToSheets, updateCallLog, getPlanDetails, getAllPlans } from './sheets.js';
+import { lookupPolicy, lookupPolicyByVin, logCall, logRequestToSheets, updateCallLog, getPlanDetails, getAllPlans, logSecurityEvent } from './sheets.js';
 import { EXTENSIONS } from './config.js';
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 const sessions = new Map();
 const sessionsByPhone = new Map();
+
+const MAX_IDENTIFY_ATTEMPTS = 3; // failed policy/VIN lookups before we cut the caller off
+const MAX_VERIFY_ATTEMPTS = 2;   // failed name-confirmations before we cut the caller off
+
+// Loose check: does the caller's utterance contain a word (3+ letters) from the name on file?
+// Not fuzzy-matched — good enough to block casual guessing, not a legal ID check.
+function matchesName(said, fullName) {
+  if (!fullName) return false;
+  const saidLower = said.toLowerCase();
+  const parts = fullName.toLowerCase().split(/\s+/).filter(p => p.length >= 3);
+  return parts.some(p => saidLower.includes(p));
+}
 
 function isAfterHours() {
   const et = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' }));
@@ -52,6 +64,9 @@ function newSession(callSid, from) {
     afterHours: isAfterHours(), stage: 'identify',
     identified: false, fallbackCount: 0, logged: false,
     greetedOnce: false,
+    verified: false, identifyAttempts: 0, verifyAttempts: 0,
+    pendingCustomerName: null, pendingVehicle: null, pendingPlanType: null,
+    vinFragment: null,
     startTime: new Date().toISOString(),
   };
 }
@@ -107,54 +122,128 @@ export async function handleUserSpeech(req, res) {
   }
 
   s.fallbackCount = 0;
+  const sl = speech.toLowerCase();
+
+  // ── Identity verification gate ──────────────────────────────────────
+  // A policy/VIN match only tells us the RECORD exists, not that this caller
+  // owns it. Until the name on file is confirmed, nothing from that record
+  // (name, vehicle, coverage, claim status) is exposed — not even to the AI.
+  if (s.identified && !s.verified) {
+    if (matchesName(rawSpeech, s.pendingCustomerName)) {
+      s.verified = true;
+      s.vehicle = s.pendingVehicle;
+      s.planType = s.pendingPlanType;
+      s.stage = 'greet';
+      sessions.set(callSid, s);
+      gather(r, callSid, `Thanks, that's confirmed. How can I help you today?`);
+      return res.type('text/xml').send(r.toString());
+    }
+    s.verifyAttempts = (s.verifyAttempts || 0) + 1;
+    console.log(`[VERIFY FAIL] ${s.policyId} attempt ${s.verifyAttempts}`);
+    if (s.verifyAttempts >= MAX_VERIFY_ATTEMPTS) {
+      s.routedTo = 'Verification failed — Security flag';
+      sessions.set(callSid, s);
+      await safeLogCall(s);
+      await logSecurityEvent({
+        timestamp: new Date().toISOString(), phone: s.from, policyId: s.policyId,
+        reason: `Name did not match policy on file after ${s.verifyAttempts} attempts`,
+      });
+      r.say({ voice: 'Polly.Matthew' }, `I'm sorry, I wasn't able to confirm your identity. Please call our office directly so our team can verify you. Goodbye.`);
+      r.hangup();
+      return res.type('text/xml').send(r.toString());
+    }
+    gather(r, callSid, `Sorry, that doesn't match what's on file. Could you say the name on the account again?`);
+    return res.type('text/xml').send(r.toString());
+  }
 
   // Extract policy W######
   const policyMatch = speech.match(/[Ww]\d{6}/);
-  if (policyMatch) {
+  if (policyMatch && !s.identified) {
     s.policyId = policyMatch[0].toUpperCase();
     console.log(`[POLICY] Extracted: ${s.policyId}`);
   }
 
-  // Extract VIN last 6
-  const vinMatch = speech.replace(/\s/g, '').match(/[A-HJ-NPR-Z0-9]{6}$/i);
-  if (vinMatch && !s.policyId && !s.identified) s.vinFragment = vinMatch[0].toUpperCase();
+  // Extract VIN — only when the caller actually says "VIN". Matching any
+  // trailing 6 characters unconditionally risked pulling up the wrong
+  // customer on unrelated speech.
+  if (/\bvin\b/.test(sl) && !s.policyId && !s.identified) {
+    const vinMatch = speech.replace(/\s/g, '').match(/[A-HJ-NPR-Z0-9]{6}$/i);
+    if (vinMatch) s.vinFragment = vinMatch[0].toUpperCase();
+  }
 
   s.messages.push({ role: 'user', content: rawSpeech });
 
-  // Policy lookup
+  // Policy lookup — a match here is provisional until verified above
   let policyData = null;
   if (s.policyId && !s.identified) {
     policyData = await lookupPolicy(s.policyId);
     if (policyData) {
       s.identified = true;
-      s.vehicle = policyData.vehicle;
-      s.planType = policyData.plan_type;
-      if (!s.name) s.name = policyData.customer_name;
-      s.stage = 'greet';
-      console.log(`[IDENTIFIED] ${s.policyId} — ${policyData.customer_name} — ${policyData.plan_type}`);
-    } else {
-      console.log(`[NOT FOUND] ${s.policyId}`);
+      s.verified = false;
+      s.pendingCustomerName = policyData.customer_name;
+      s.pendingVehicle = policyData.vehicle;
+      s.pendingPlanType = policyData.plan_type;
+      console.log(`[MATCHED] ${s.policyId} — awaiting identity verification`);
+      sessions.set(callSid, s);
+      gather(r, callSid, `Thanks. Can you confirm the name on the account?`);
+      return res.type('text/xml').send(r.toString());
     }
+    s.identifyAttempts = (s.identifyAttempts || 0) + 1;
+    console.log(`[NOT FOUND] ${s.policyId} attempt ${s.identifyAttempts}`);
+    s.policyId = null;
+    if (s.identifyAttempts >= MAX_IDENTIFY_ATTEMPTS) {
+      sessions.set(callSid, s);
+      await logSecurityEvent({
+        timestamp: new Date().toISOString(), phone: s.from, policyId: policyMatch[0].toUpperCase(),
+        reason: `${s.identifyAttempts} failed policy lookups in one call`,
+      });
+      r.say({ voice: 'Polly.Matthew' }, `I'm having trouble finding that policy. Please leave your name and number and our team will call you back.`);
+      r.record({ action: `/voice/recording?callSid=${callSid}`, maxLength: 120, playBeep: true });
+      return res.type('text/xml').send(r.toString());
+    }
+    sessions.set(callSid, s);
+    gather(r, callSid, `I couldn't find that policy number. Could you say it again? It starts with W followed by six digits.`);
+    return res.type('text/xml').send(r.toString());
+
   } else if (s.vinFragment && !s.identified) {
     policyData = await lookupPolicyByVin(s.vinFragment);
     if (policyData) {
       s.identified = true;
+      s.verified = false;
       s.policyId = policyData.policy_id;
-      s.vehicle = policyData.vehicle;
-      s.planType = policyData.plan_type;
-      if (!s.name) s.name = policyData.customer_name;
-      s.stage = 'greet';
-      console.log(`[IDENTIFIED VIN] ${s.policyId} — ${policyData.customer_name}`);
+      s.pendingCustomerName = policyData.customer_name;
+      s.pendingVehicle = policyData.vehicle;
+      s.pendingPlanType = policyData.plan_type;
+      console.log(`[MATCHED VIN] ${s.policyId} — awaiting identity verification`);
+      sessions.set(callSid, s);
+      gather(r, callSid, `Thanks. Can you confirm the name on the account?`);
+      return res.type('text/xml').send(r.toString());
     }
+    s.identifyAttempts = (s.identifyAttempts || 0) + 1;
+    s.vinFragment = null;
+    console.log(`[VIN NOT FOUND] attempt ${s.identifyAttempts}`);
+    if (s.identifyAttempts >= MAX_IDENTIFY_ATTEMPTS) {
+      sessions.set(callSid, s);
+      await logSecurityEvent({
+        timestamp: new Date().toISOString(), phone: s.from, policyId: '(VIN attempt)',
+        reason: `${s.identifyAttempts} failed lookups in one call`,
+      });
+      r.say({ voice: 'Polly.Matthew' }, `I'm having trouble finding that. Please leave your name and number and our team will call you back.`);
+      r.record({ action: `/voice/recording?callSid=${callSid}`, maxLength: 120, playBeep: true });
+      return res.type('text/xml').send(r.toString());
+    }
+    sessions.set(callSid, s);
+    gather(r, callSid, `I couldn't match that VIN. Could you give me your policy number instead? It starts with W followed by six digits.`);
+    return res.type('text/xml').send(r.toString());
+
   } else if (s.policyId && s.identified) {
     policyData = await lookupPolicy(s.policyId);
   }
 
   let planData = null;
-  if (s.planType) planData = await getPlanDetails(s.planType);
+  if (s.verified && s.planType) planData = await getPlanDetails(s.planType);
 
   let allPlans = [];
-  const sl = speech.toLowerCase();
   const plansKw = ['what plans','what coverage','what options','types of warranty',
     'available plans','recommend','which plan','best plan','what do you offer','upgrade'];
   if (plansKw.some(k => sl.includes(k))) {
@@ -164,7 +253,7 @@ export async function handleUserSpeech(req, res) {
 
   sessions.set(callSid, s);
 
-  const ai = await getAIResponse(s, rawSpeech, policyData, planData, allPlans);
+  const ai = await getAIResponse(s, rawSpeech, s.verified ? policyData : null, planData, allPlans);
 
   // Update session from AI
   if (ai.extracted?.name && !s.name) s.name = ai.extracted.name;
