@@ -1,7 +1,7 @@
 import express from 'express';
 import { fileURLToPath } from 'url';
 import path from 'path';
-import { handleIncomingCall, handleUserSpeech, handleRecording } from './callHandler.js';
+import { handleIncomingCall, handleUserSpeech, handleRecording, handleCallStatus } from './callHandler.js';
 import { lookupPolicy, getCallLog, getRequests, updateRequestStatus } from './sheets.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -14,6 +14,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.post('/voice/incoming', handleIncomingCall);
 app.post('/voice/speech',   handleUserSpeech);
 app.post('/voice/recording', handleRecording);
+app.post('/voice/status',   handleCallStatus);
 
 app.get('/api/calls', async (req, res) => {
   try { res.json(await getCallLog()); }

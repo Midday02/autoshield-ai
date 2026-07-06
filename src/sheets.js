@@ -2,17 +2,21 @@ import { google } from 'googleapis';
 
 const SHEET_ID = process.env.GOOGLE_SHEET_ID;
 
-function getAuth() {
-  const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON);
-  return new google.auth.GoogleAuth({
-    credentials,
-    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-  });
-}
+let sheetsClientPromise = null;
 
 async function getSheets() {
-  const auth = await getAuth().getClient();
-  return google.sheets({ version: 'v4', auth });
+  if (!sheetsClientPromise) {
+    sheetsClientPromise = (async () => {
+      const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON);
+      const auth = new google.auth.GoogleAuth({
+        credentials,
+        scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+      });
+      const client = await auth.getClient();
+      return google.sheets({ version: 'v4', auth: client });
+    })().catch(e => { sheetsClientPromise = null; throw e; });
+  }
+  return sheetsClientPromise;
 }
 
 function parseRow(row) {

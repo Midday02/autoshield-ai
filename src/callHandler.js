@@ -202,13 +202,14 @@ export async function handleUserSpeech(req, res) {
       gather(r, callSid, `Thanks. Can you confirm the name on the account?`);
       return res.type('text/xml').send(r.toString());
     }
+    const failedPolicyId = s.policyId;
     s.identifyAttempts = (s.identifyAttempts || 0) + 1;
-    console.log(`[NOT FOUND] ${s.policyId} attempt ${s.identifyAttempts}`);
+    console.log(`[NOT FOUND] ${failedPolicyId} attempt ${s.identifyAttempts}`);
     s.policyId = null;
     if (s.identifyAttempts >= MAX_IDENTIFY_ATTEMPTS) {
       sessions.set(callSid, s);
       await logSecurityEvent({
-        timestamp: new Date().toISOString(), phone: s.from, policyId: policyMatch[0].toUpperCase(),
+        timestamp: new Date().toISOString(), phone: s.from, policyId: failedPolicyId,
         reason: `${s.identifyAttempts} failed policy lookups in one call`,
       });
       r.say({ voice: 'Polly.Matthew' }, `I'm having trouble finding that policy. Please leave your name and number and our team will call you back.`);
@@ -384,6 +385,11 @@ export async function handleCallStatus(req, res) {
       await safeLogRequest(s, s.reason || s.intent || 'Call ended without resolution');
       console.log(`[AUTO-LOG] ${s.name} / ${s.policyId}`);
     }
+    // Prevent unbounded Map growth and stale verified-session reuse by a later call.
+    sessions.delete(callSid);
+    if (from && sessionsByPhone.get(from)?.callSid === callSid) {
+      sessionsByPhone.delete(from);
+    }
   }
   res.sendStatus(200);
 }
@@ -513,8 +519,9 @@ RULES:
 8. action=goodbye ONLY when caller clearly signals end of call AND you have said a proper farewell sentence. Examples: after you ask "Is there anything else?" and caller says "no/nope/that's all/thanks" → say "Great, have a wonderful day! Goodbye!" with action=goodbye. Mid-conversation "no" (answering a yes/no question) is NOT a goodbye trigger — use collect_more instead. Always say a farewell sentence before goodbye action.
 9. Keep responses 2-4 sentences. Coverage/plan questions: up to 6 sentences.
 10. NEVER invent plan names — only plans from ALL PLANS list
+11. NEVER ask about vehicle issue, symptoms, mileage, or "what's wrong with the car" unless Intent is Claim. For Sales, Billing, Renewal, Escalation, or unknown intent — figure out what the caller needs first; do not default to claim-style questions.
 
-CLAIM FLOW (only when intent=Claim):
+CLAIM FLOW (only when intent=Claim — do not use this flow or its questions for any other intent):
 - Collect one field at a time: issue → when_started → mileage → at_shop → symptoms
 - Fields still needed: ${claimMissing.join(', ') || 'ALL COLLECTED'}
 - When all 5 collected → stage=confirm, summarize ONCE in 2 sentences, ask "Does that sound right?"
