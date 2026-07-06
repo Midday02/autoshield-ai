@@ -1,4 +1,5 @@
 import express from 'express';
+import twilio from 'twilio';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import { handleIncomingCall, handleUserSpeech, handleRecording, handleCallStatus } from './callHandler.js';
@@ -7,14 +8,22 @@ import { lookupPolicy, getCallLog, getRequests, updateRequestStatus } from './sh
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
+// Railway terminates TLS at the edge and proxies over HTTP — without this,
+// req.protocol reports 'http' and Twilio signature validation always fails
+// because the URL it signed was the public https:// one.
+app.set('trust proxy', true);
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.post('/voice/incoming', handleIncomingCall);
-app.post('/voice/speech',   handleUserSpeech);
-app.post('/voice/recording', handleRecording);
-app.post('/voice/status',   handleCallStatus);
+// Rejects any /voice/* POST that isn't signed by Twilio (X-Twilio-Signature),
+// so the endpoints can't be spoofed by a third party who finds the URL.
+const validateTwilioRequest = twilio.webhook();
+
+app.post('/voice/incoming', validateTwilioRequest, handleIncomingCall);
+app.post('/voice/speech',   validateTwilioRequest, handleUserSpeech);
+app.post('/voice/recording', validateTwilioRequest, handleRecording);
+app.post('/voice/status',   validateTwilioRequest, handleCallStatus);
 
 app.get('/api/calls', async (req, res) => {
   try { res.json(await getCallLog()); }
