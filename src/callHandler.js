@@ -57,11 +57,17 @@ function normalizeSpeech(text) {
   // Collapse digit groups that follow W (handles "W1 000001" → "W1000001")
   s = s.replace(/([Ww]\d+)\s(\d+)/g, (_, a, b) => a + b);
   // Join W + digits — keep exactly 6. If speech produces 7 digits (Twilio
-  // artefact like "W1 000001"), we store both candidates separated by | so
-  // the lookup block can try both.
+  // sometimes adds a stray digit anywhere — not just at the start/end, e.g.
+  // reading "100007" as "1-triple zero-zero zero seven" produces 1000007),
+  // try dropping each of the 7 positions and dedupe, storing every distinct
+  // 6-digit candidate separated by | so the lookup block can try them all.
   s = s.replace(/[Ww][\s\d]{6,}/g, m => {
     const digits = m.replace(/[Ww\s]/g, '');
-    if (digits.length === 7) return `W${digits.slice(0,6)}|W${digits.slice(1)}`;
+    if (digits.length === 7) {
+      const candidates = new Set();
+      for (let i = 0; i < 7; i++) candidates.add(digits.slice(0, i) + digits.slice(i + 1));
+      return [...candidates].map(d => 'W' + d).join('|');
+    }
     return 'W' + digits.slice(0, 6);
   });
   return s;
