@@ -115,6 +115,9 @@ tr.row-click:hover td{background:var(--s2)}
 .search-input::placeholder{color:var(--t3)}
 select.filter-sel{padding:6px 8px;background:var(--s2);border:0.5px solid var(--bd);border-radius:var(--r2);font-size:11px;color:var(--t2);outline:none;font-family:var(--font);cursor:pointer}
 select.filter-sel:focus{border-color:var(--blue)}
+.edit-input,.edit-textarea{width:100%;padding:7px 10px;background:var(--s2);border:0.5px solid var(--bd);border-radius:var(--r2);font-size:12px;color:var(--t1);outline:none;font-family:var(--font)}
+.edit-input:focus,.edit-textarea:focus{border-color:var(--blue)}
+.edit-textarea{resize:vertical;line-height:1.5}
 
 .detail-panel{border-top:0.5px solid var(--bd);display:none}
 .detail-panel.open{display:block}
@@ -246,6 +249,10 @@ select.filter-sel:focus{border-color:var(--blue)}
     <div class="nav-item" onclick="showPage('crm',this)">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       Warranty Lookup
+    </div>
+    <div class="nav-item" onclick="showPage('clients',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg>
+      Clients<span class="nav-count" id="nav-client-count">0</span>
     </div>
     <div class="nav-sec">Setup</div>
     <div class="nav-item" onclick="showPage('directory',this)">
@@ -382,7 +389,7 @@ select.filter-sel:focus{border-color:var(--blue)}
           <div class="card-head"><span class="card-title">Warranty Lookup</span></div>
           <div class="card-body">
             <div style="display:flex;gap:8px;margin-bottom:4px">
-              <input class="search-input" id="policy-input" placeholder="W482031" maxlength="7" style="flex:1" onkeydown="if(event.key==='Enter')lookupCRM()">
+              <input class="search-input" id="policy-input" placeholder="W100001" maxlength="7" style="flex:1" onkeydown="if(event.key==='Enter')lookupCRM()">
               <button class="btn btn-primary" onclick="lookupCRM()">Search</button>
             </div>
             <div id="crm-err" style="display:none;font-size:12px;color:var(--red-t);margin-top:8px"></div>
@@ -392,15 +399,6 @@ select.filter-sel:focus{border-color:var(--blue)}
                 <div id="p-badge"></div>
               </div>
               <div id="p-fields"></div>
-            </div>
-            <div style="margin-top:14px;padding-top:12px;border-top:0.5px solid var(--bd)">
-              <div style="font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Quick access</div>
-              <div style="display:flex;flex-wrap:wrap;gap:6px">
-                <button class="btn" onclick="setPolicy('W482031')">W482031</button>
-                <button class="btn" onclick="setPolicy('W291847')">W291847</button>
-                <button class="btn" onclick="setPolicy('W881234')">W881234</button>
-                <button class="btn" onclick="setPolicy('W923456')">W923456</button>
-              </div>
             </div>
           </div>
         </div>
@@ -424,6 +422,26 @@ select.filter-sel:focus{border-color:var(--blue)}
             </div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- CLIENTS -->
+    <div class="page" id="page-clients">
+      <div class="card">
+        <div class="card-head">
+          <span class="card-title">All Clients</span>
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;width:100%">
+            <input class="search-input" id="client-search" placeholder="Search name, policy, VIN..." oninput="filterClients()" style="flex:1;min-width:120px">
+            <select class="filter-sel" id="client-status-filter" onchange="filterClients()">
+              <option value="">All coverage</option>
+              <option value="active">Active</option>
+              <option value="expiring">Expiring soon</option>
+              <option value="expired">Expired</option>
+            </select>
+            <span class="chip chip-gray" id="client-count">0</span>
+          </div>
+        </div>
+        <div id="client-cards" class="req-grid"></div>
       </div>
     </div>
 
@@ -507,6 +525,10 @@ select.filter-sel:focus{border-color:var(--blue)}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
       <span class="bnav-label">Lookup</span>
     </div>
+    <div class="bnav-item" id="bnav-clients" onclick="showPageMobile('clients','bnav-clients')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg>
+      <span class="bnav-label">Clients</span>
+    </div>
     <div class="bnav-item" id="bnav-directory" onclick="showPageMobile('directory','bnav-directory')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
       <span class="bnav-label">Directory</span>
@@ -530,8 +552,8 @@ select.filter-sel:focus{border-color:var(--blue)}
 <div class="toast" id="toast"></div>
 
 <script>
-const pages={overview:{t:'Overview',s:'Live stats — auto-refreshes every 60s'},requests:{t:'Requests',s:'All requests — click a card to open client profile'},calls:{t:'Call Log',s:'All calls — click a row for details'},crm:{t:'Warranty Lookup',s:'Search policies from Google Sheets'},directory:{t:'Directory & Routing',s:'Extensions and AI flow'},roadmap:{t:'Roadmap',s:'What we built and what is next'}};
-let allCalls=[],allRequests=[],filtCalls=[],filtRequests=[];
+const pages={overview:{t:'Overview',s:'Live stats — auto-refreshes every 60s'},requests:{t:'Requests',s:'All requests — click a card to open client profile'},calls:{t:'Call Log',s:'All calls — click a row for details'},crm:{t:'Warranty Lookup',s:'Search policies from Google Sheets'},clients:{t:'Clients',s:'All policies — click a card to view profile'},directory:{t:'Directory & Routing',s:'Extensions and AI flow'},roadmap:{t:'Roadmap',s:'What we built and what is next'}};
+let allCalls=[],allRequests=[],allClients=[],filtCalls=[],filtRequests=[],filtClients=[];
 
 function showPage(id,el){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -542,6 +564,7 @@ function showPage(id,el){
   document.getElementById('page-sub').textContent=pages[id].s;
   if(id==='calls')renderCallsTable();
   if(id==='requests')renderReqCards('req-cards',filtRequests);
+  if(id==='clients')renderClientCards();
 }
 function showPageMobile(id,btnId){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -550,6 +573,7 @@ function showPageMobile(id,btnId){
   document.getElementById(btnId).classList.add('active');
   if(id==='calls')renderCallsTable();
   if(id==='requests')renderReqCards('req-cards',filtRequests);
+  if(id==='clients')renderClientCards();
 }
 
 function toast(m,dur=2000){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur)}
@@ -598,6 +622,57 @@ async function fetchRequests(){
     renderReqCards('ov-requests',allRequests.slice(0,4));
     renderReqBreakdown();
   }catch{}
+}
+
+async function fetchClients(){
+  try{
+    allClients=await(await fetch('/api/clients')).json();
+    filtClients=[...allClients];
+    document.getElementById('nav-client-count').textContent=allClients.length;
+  }catch{}
+}
+
+function escHtml(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function escAttr(s){return escHtml(s).replace(/"/g,'&quot;')}
+
+function daysLeftOf(c){return Math.floor((new Date(c.coverage_end)-new Date())/(1000*60*60*24))}
+
+function renderClientCards(){
+  const el=document.getElementById('client-cards');
+  if(!el)return;
+  if(!filtClients.length){el.innerHTML='<div class="empty">No clients found</div>';return}
+  el.innerHTML=filtClients.map(c=>{
+    const dl=daysLeftOf(c);
+    const status=!c.active?{cls:'chip-red',label:'Expired'}:dl<90?{cls:'chip-amber',label:dl+'d left'}:{cls:'chip-green',label:'Active'};
+    return `<div class="req-card" onclick="openClientCard(${JSON.stringify(c).replace(/"/g,'&quot;')})">
+      <div class="req-card-top">
+        <div><div class="req-card-name">${escHtml(c.customer_name)||'Unknown'}</div><div class="req-card-sub">${escHtml(c.vehicle)||'—'}</div></div>
+        <span class="chip ${status.cls}" style="font-size:10px">${status.label}</span>
+      </div>
+      <div class="req-card-body">${escHtml(c.plan_type)||'—'} plan · ${escHtml(c.phone)||'—'}</div>
+      <div class="req-card-foot">
+        <span class="chip chip-blue" style="font-size:10px">${c.policy_id}</span>
+        <span class="req-card-meta">${c.claim_status&&c.claim_status!=='None'?'Claim: '+escHtml(c.claim_status):''}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterClients(){
+  const q=document.getElementById('client-search').value.toLowerCase();
+  const st=document.getElementById('client-status-filter').value;
+  filtClients=allClients.filter(c=>{
+    const m=!q||(c.customer_name||'').toLowerCase().includes(q)||(c.policy_id||'').toLowerCase().includes(q)||(c.vin||'').toLowerCase().includes(q)||(c.vehicle||'').toLowerCase().includes(q);
+    const dl=daysLeftOf(c);
+    const stMatch=!st||(st==='active'&&c.active&&dl>=90)||(st==='expiring'&&c.active&&dl<90)||(st==='expired'&&!c.active);
+    return m&&stMatch;
+  });
+  document.getElementById('client-count').textContent=filtClients.length+' clients';
+  renderClientCards();
+}
+
+function openClientCard(c){
+  openClientProfile({name:c.customer_name,phone:c.phone,policyId:c.policy_id,__clientOnly:true},null);
 }
 
 function renderBreakdown(){
@@ -722,12 +797,14 @@ async function openClientProfile(r,idx){
   const claimColors={'Accepted':'chip-green','WIP':'chip-amber','Done':'chip-blue','Rejected':'chip-red','None':'chip-gray'};
   const claimLabel={'WIP':'In Progress'};
 
+  const isRequest=idx!==null&&idx!==undefined&&!r.__clientOnly;
+
   body.innerHTML=`
     <div class="profile-hero">
-      <div class="profile-avatar">${initials}</div>
+      <div class="profile-avatar">${escHtml(initials)}</div>
       <div>
-        <div class="profile-name">${r.name||'Unknown'}</div>
-        <div class="profile-sub">${r.policyId||'No policy'} · ${r.phone||'—'}</div>
+        <div class="profile-name">${escHtml(r.name)||'Unknown'}</div>
+        <div class="profile-sub">${escHtml(r.policyId)||'No policy'} · ${escHtml(r.phone)||'—'}</div>
       </div>
     </div>
 
@@ -735,34 +812,47 @@ async function openClientProfile(r,idx){
     <div class="profile-section">
       <div class="profile-section-title">Coverage</div>
       <div class="profile-grid">
-        <div class="profile-field"><label>Vehicle</label><span>${policy.vehicle}</span></div>
-        <div class="profile-field"><label>Plan</label><span>${policy.plan_type}</span></div>
-        <div class="profile-field"><label>Coverage start</label><span>${policy.coverage_start}</span></div>
-        <div class="profile-field"><label>Coverage end</label><span>${policy.coverage_end}</span></div>
+        <div class="profile-field"><label>Vehicle</label><span>${escHtml(policy.vehicle)}</span></div>
+        <div class="profile-field"><label>Plan</label><span>${escHtml(policy.plan_type)}</span></div>
+        <div class="profile-field"><label>Coverage start</label><span>${escHtml(policy.coverage_start)}</span></div>
+        <div class="profile-field"><label>Coverage end</label><span>${escHtml(policy.coverage_end)}</span></div>
         <div class="profile-field" style="grid-column:span 2">
           <label>Coverage status — ${policy.active?`${daysLeft} days remaining`:'Expired'}</label>
           <span class="chip ${policy.active?daysLeft<90?'chip-amber':'chip-green':'chip-red'}" style="font-size:11px">${policy.active?'Active':'Expired'}</span>
           <div class="coverage-bar" style="margin-top:8px"><div class="coverage-fill ${coverClass}" style="width:${pct}%"></div></div>
         </div>
-        <div class="profile-field"><label>VIN</label><span class="mono" style="font-size:11px">${policy.vin||'—'}</span></div>
-        <div class="profile-field"><label>Claim status</label><span class="claim-badge ${claimColors[policy.claim_status]||'chip-gray'}">${claimLabel[policy.claim_status]||policy.claim_status||'None'}</span></div>
+        <div class="profile-field"><label>VIN</label><span class="mono" style="font-size:11px">${escHtml(policy.vin)||'—'}</span></div>
+        <div class="profile-field"><label>Claim status</label><span class="claim-badge ${claimColors[policy.claim_status]||'chip-gray'}">${escHtml(claimLabel[policy.claim_status]||policy.claim_status)||'None'}</span></div>
       </div>
-      ${policy.notes?`<div style="margin-top:10px"><div class="profile-section-title">Notes</div><div class="notes-box">${policy.notes}</div></div>`:''}
+    </div>
+
+    <div class="profile-section">
+      <div class="profile-section-title">Client Info</div>
+      <div class="profile-grid">
+        <div class="profile-field"><label>Name</label><input class="edit-input" id="edit-name" value="${escAttr(policy.customer_name)}"></div>
+        <div class="profile-field"><label>Phone</label><input class="edit-input" id="edit-phone" value="${escAttr(policy.phone)}"></div>
+      </div>
+      <div class="profile-field" style="margin-top:8px">
+        <label>Notes</label>
+        <textarea class="edit-textarea" id="edit-notes" rows="3" placeholder="Internal notes about this client...">${escHtml(policy.notes)}</textarea>
+      </div>
+      <button class="btn btn-primary" style="margin-top:10px" onclick="saveClientInfo('${policy.policy_id}')">Save changes</button>
     </div>`:`
     <div class="profile-section">
       <div style="background:var(--s2);border-radius:var(--r2);padding:12px;font-size:12px;color:var(--t3);text-align:center">
-        ${r.policyId?`Policy ${r.policyId} not found in CRM`:'No policy number — new client or dealer inquiry'}
+        ${r.policyId?`Policy ${escHtml(r.policyId)} not found in CRM`:'No policy number — new client or dealer inquiry'}
       </div>
     </div>`}
 
+    ${isRequest?`
     <div class="profile-section">
       <div class="profile-section-title">Request Details</div>
       <div class="profile-grid">
-        <div class="profile-field"><label>Type</label><span>${r.type||'—'}</span></div>
-        <div class="profile-field"><label>Department</label><span>${r.department||'—'}</span></div>
-        <div class="profile-field" style="grid-column:span 2"><label>Summary</label><span style="font-weight:400;color:var(--t2);line-height:1.6;display:block">${r.summary||'—'}</span></div>
+        <div class="profile-field"><label>Type</label><span>${escHtml(r.type)||'—'}</span></div>
+        <div class="profile-field"><label>Department</label><span>${escHtml(r.department)||'—'}</span></div>
+        <div class="profile-field" style="grid-column:span 2"><label>Summary</label><span style="font-weight:400;color:var(--t2);line-height:1.6;display:block">${escHtml(r.summary)||'—'}</span></div>
         ${parseDetails(r.details)?`<div class="profile-field" style="grid-column:span 2"><label>Claim details</label><span style="font-weight:400;color:var(--t2);line-height:1.6;display:block">${parseDetails(r.details)}</span></div>`:''}
-        <div class="profile-field"><label>Caller type</label><span>${r.callerType||'—'}</span></div>
+        <div class="profile-field"><label>Caller type</label><span>${escHtml(r.callerType)||'—'}</span></div>
         <div class="profile-field"><label>Time</label><span>${formatTime(r.timestamp)}</span></div>
       </div>
     </div>
@@ -772,7 +862,27 @@ async function openClientProfile(r,idx){
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         ${['New','In Progress','Done','Escalated'].map(s=>`<button class="status-btn ${r.status===s?'active-'+s.toLowerCase().replace(' ','-'):''}" style="padding:6px 14px;font-size:12px" onclick="updateStatusFromModal(${idx},'${s}',this)">${s}</button>`).join('')}
       </div>
-    </div>`;
+    </div>`:''}`;
+}
+
+async function saveClientInfo(policyId){
+  const name=document.getElementById('edit-name').value.trim();
+  const phone=document.getElementById('edit-phone').value.trim();
+  const notes=document.getElementById('edit-notes').value.trim();
+  toast('Saving...');
+  try{
+    const res=await fetch('/api/warranty/'+policyId,{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({customer_name:name,phone,notes}),
+    });
+    if(!res.ok)throw new Error();
+    document.getElementById('modal-title').textContent=name||'Client Profile';
+    const pn=document.querySelector('.profile-name');if(pn)pn.textContent=name||'Unknown';
+    const c=allClients.find(x=>x.policy_id===policyId);
+    if(c){c.customer_name=name;c.phone=phone;c.notes=notes;}
+    toast('Saved ✓');
+  }catch{toast('Could not save — check connection')}
 }
 
 async function updateStatusFromModal(idx,status,btn){
@@ -874,12 +984,11 @@ async function lookupCRM(){
     res.classList.add('show');
   }catch{err.textContent='Could not reach server.';err.style.display='block'}
 }
-function setPolicy(p){document.getElementById('policy-input').value=p;lookupCRM()}
 function formatTime(ts){if(!ts)return'—';try{return new Date(ts).toLocaleString('en-CA',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false})}catch{return ts.slice(0,16)||ts}}
 function routeChip(rt){if(!rt)return'<span class="dim">—</span>';if(rt.includes('Sales'))return`<span class="chip chip-green" style="font-size:10px">${rt}</span>`;if(rt.includes('Claims'))return`<span class="chip chip-blue" style="font-size:10px">${rt}</span>`;if(rt.includes('Account'))return`<span class="chip chip-purple" style="font-size:10px">${rt}</span>`;if(rt.includes('Management'))return`<span class="chip chip-amber" style="font-size:10px">${rt}</span>`;return`<span class="chip chip-gray" style="font-size:10px">${rt}</span>`;}
 function statusChipHtml(s){if(!s)return'—';if(s==='Completed')return`<span class="chip chip-gray" style="font-size:10px">Completed</span>`;if(s==='VM Left')return`<span class="chip chip-amber" style="font-size:10px">VM Left</span>`;return`<span class="chip chip-gray" style="font-size:10px">${s}</span>`;}
 
-async function refreshAll(){toast('Refreshing...');await Promise.all([fetchStats(),fetchCalls(),fetchRequests()]);toast('Updated ✓')}
+async function refreshAll(){toast('Refreshing...');await Promise.all([fetchStats(),fetchCalls(),fetchRequests(),fetchClients()]);if(document.getElementById('page-clients').classList.contains('active'))renderClientCards();toast('Updated ✓')}
 refreshAll();
 setInterval(refreshAll,60000);
 </script>

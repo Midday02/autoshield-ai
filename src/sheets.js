@@ -73,29 +73,69 @@ export async function getPlanDetails(planName) {
   }
 }
 
-export async function lookupPolicy(policyId) {
+function mapWarrantyRow(row) {
+  return {
+    policy_id:      row[0],
+    customer_name:  row[1],
+    phone:          row[2],
+    vehicle:        row[3],
+    vin:            row[4],
+    coverage_start: row[5],
+    coverage_end:   row[6],
+    plan_type:      row[7],
+    claim_status:   row[8] || 'None',
+    notes:          row[9] || '',
+    active:         new Date(row[6]) >= new Date(),
+  };
+}
+
+async function getWarrantyRows() {
+  const sheets = await getSheets();
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: SHEET_ID,
+    range: 'Warranties!A2:J1000',
+  });
+  return res.data.values || [];
+}
+
+export async function getAllPolicies() {
+  try {
+    const rows = await getWarrantyRows();
+    return rows.filter(r => r[0]).map(mapWarrantyRow);
+  } catch (e) {
+    console.error('getAllPolicies error:', e.message);
+    return [];
+  }
+}
+
+export async function updatePolicyInfo(policyId, updates) {
   try {
     const sheets = await getSheets();
-    const res = await sheets.spreadsheets.values.get({
+    const rows = await getWarrantyRows();
+    const rowIndex = rows.findIndex(r => r[0]?.toUpperCase() === policyId.toUpperCase());
+    if (rowIndex === -1) return false;
+    const sheetRow = rowIndex + 2; // +1 for header row, +1 for 1-based sheet rows
+    const data = [];
+    if (updates.customer_name !== undefined) data.push({ range: `Warranties!B${sheetRow}`, values: [[updates.customer_name]] });
+    if (updates.phone !== undefined) data.push({ range: `Warranties!C${sheetRow}`, values: [[updates.phone]] });
+    if (updates.notes !== undefined) data.push({ range: `Warranties!J${sheetRow}`, values: [[updates.notes]] });
+    if (!data.length) return true;
+    await sheets.spreadsheets.values.batchUpdate({
       spreadsheetId: SHEET_ID,
-      range: 'Warranties!A2:J1000',
+      resource: { valueInputOption: 'USER_ENTERED', data },
     });
-    const rows = res.data.values || [];
+    return true;
+  } catch (e) {
+    console.error('updatePolicyInfo error:', e.message);
+    return false;
+  }
+}
+
+export async function lookupPolicy(policyId) {
+  try {
+    const rows = await getWarrantyRows();
     const row = rows.find(r => r[0]?.toUpperCase() === policyId.toUpperCase());
-    if (!row) return null;
-    return {
-      policy_id:      row[0],
-      customer_name:  row[1],
-      phone:          row[2],
-      vehicle:        row[3],
-      vin:            row[4],
-      coverage_start: row[5],
-      coverage_end:   row[6],
-      plan_type:      row[7],
-      claim_status:   row[8] || 'None',
-      notes:          row[9] || '',
-      active:         new Date(row[6]) >= new Date(),
-    };
+    return row ? mapWarrantyRow(row) : null;
   } catch (e) {
     console.error('lookupPolicy error:', e.message);
     return null;
@@ -104,28 +144,10 @@ export async function lookupPolicy(policyId) {
 
 export async function lookupPolicyByVin(vinFragment) {
   try {
-    const sheets = await getSheets();
-    const res = await sheets.spreadsheets.values.get({
-      spreadsheetId: SHEET_ID,
-      range: 'Warranties!A2:J1000',
-    });
-    const rows = res.data.values || [];
+    const rows = await getWarrantyRows();
     const clean = vinFragment.replace(/\s/g, '').toUpperCase();
     const row = rows.find(r => r[4]?.toUpperCase().endsWith(clean));
-    if (!row) return null;
-    return {
-      policy_id:      row[0],
-      customer_name:  row[1],
-      phone:          row[2],
-      vehicle:        row[3],
-      vin:            row[4],
-      coverage_start: row[5],
-      coverage_end:   row[6],
-      plan_type:      row[7],
-      claim_status:   row[8] || 'None',
-      notes:          row[9] || '',
-      active:         new Date(row[6]) >= new Date(),
-    };
+    return row ? mapWarrantyRow(row) : null;
   } catch (e) {
     console.error('lookupPolicyByVin error:', e.message);
     return null;

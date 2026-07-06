@@ -3,7 +3,7 @@ import twilio from 'twilio';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import { handleIncomingCall, handleUserSpeech, handleRecording, handleCallStatus } from './callHandler.js';
-import { lookupPolicy, getCallLog, getRequests, updateRequestStatus } from './sheets.js';
+import { lookupPolicy, getAllPolicies, updatePolicyInfo, getCallLog, getRequests, updateRequestStatus } from './sheets.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -54,6 +54,23 @@ app.get('/api/warranty/:id', async (req, res) => {
     if (!policy) return res.status(404).json({ error: 'Not found' });
     res.json(policy);
   } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.patch('/api/warranty/:id', async (req, res) => {
+  try {
+    const updates = {};
+    if (typeof req.body.customer_name === 'string') updates.customer_name = req.body.customer_name.trim();
+    if (typeof req.body.phone === 'string') updates.phone = req.body.phone.trim();
+    if (typeof req.body.notes === 'string') updates.notes = req.body.notes.trim();
+    const ok = await updatePolicyInfo(req.params.id.toUpperCase(), updates);
+    if (!ok) return res.status(404).json({ error: 'Not found' });
+    res.json({ ok: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+app.get('/api/clients', async (req, res) => {
+  try { res.json(await getAllPolicies()); }
+  catch { res.json([]); }
 });
 
 app.get('/api/stats', async (req, res) => {
