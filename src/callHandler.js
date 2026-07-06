@@ -50,8 +50,16 @@ function normalizeSpeech(text) {
     .replace(/\bdouble\s+you\b/gi, 'W')
     .replace(/\b(zero|one|two|three|four|five|six|seven|eight|nine|oh|nought)\b/gi,
       m => numWords[m.toLowerCase()] || m);
-  // Join W + digits
-  s = s.replace(/[Ww][\s0-9]{6,}/g, m => m.replace(/\s/g, ''));
+  // Collapse digit groups that follow W (handles "W1 000001" → "W1000001")
+  s = s.replace(/([Ww]\d+)\s(\d+)/g, (_, a, b) => a + b);
+  // Join W + digits — keep exactly 6. If speech produces 7 digits (Twilio
+  // artefact like "W1 000001"), we store both candidates separated by | so
+  // the lookup block can try both.
+  s = s.replace(/[Ww][\s\d]{6,}/g, m => {
+    const digits = m.replace(/[Ww\s]/g, '');
+    if (digits.length === 7) return `W${digits.slice(0,6)}|W${digits.slice(1)}`;
+    return 'W' + digits.slice(0, 6);
+  });
   return s;
 }
 
@@ -156,11 +164,13 @@ export async function handleUserSpeech(req, res) {
     return res.type('text/xml').send(r.toString());
   }
 
-  // Extract policy W######
-  const policyMatch = speech.match(/[Ww]\d{6}/);
-  if (policyMatch && !s.identified) {
-    s.policyId = policyMatch[0].toUpperCase();
-    console.log(`[POLICY] Extracted: ${s.policyId}`);
+  // Extract policy W###### — normalizeSpeech may produce "Wxxxxxx|Wxxxxxx"
+  // when Twilio adds an extra leading digit. We try all candidates during lookup.
+  const policyMatches = [...speech.matchAll(/[Ww]\d{6}/g)].map(m => m[0].toUpperCase());
+  if (policyMatches.length && !s.identified) {
+    s.policyId = policyMatches[0];
+    s.policyCandidates = policyMatches;
+    console.log(`[POLICY] Candidates: ${policyMatches.join(', ')}`);
   }
 
   // Extract VIN — only when the caller actually says "VIN". Matching any
@@ -173,10 +183,14 @@ export async function handleUserSpeech(req, res) {
 
   s.messages.push({ role: 'user', content: rawSpeech });
 
-  // Policy lookup — a match here is provisional until verified above
+  // Policy lookup — try all candidates (handles Twilio 7-digit artefact)
   let policyData = null;
   if (s.policyId && !s.identified) {
-    policyData = await lookupPolicy(s.policyId);
+    const candidates = s.policyCandidates?.length ? s.policyCandidates : [s.policyId];
+    for (const candidate of candidates) {
+      policyData = await lookupPolicy(candidate);
+      if (policyData) { s.policyId = candidate; break; }
+    }
     if (policyData) {
       s.identified = true;
       s.verified = false;
