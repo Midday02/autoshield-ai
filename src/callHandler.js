@@ -20,6 +20,10 @@ function matchesName(said, fullName) {
   return parts.some(p => saidLower.includes(p));
 }
 
+function normalizeForCompare(text) {
+  return (text || '').toLowerCase().replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, ' ').trim();
+}
+
 function isAfterHours() {
   const et = new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' }));
   const h = et.getHours(), d = et.getDay();
@@ -283,6 +287,20 @@ export async function handleUserSpeech(req, res) {
   sessions.set(callSid, s);
 
   const ai = await getAIResponse(s, rawSpeech, s.verified ? policyData : null, planData, allPlans);
+
+  // Circuit breaker: if the AI is about to say the exact same thing it just
+  // said, it's stuck in a loop (seen live — repeated "policy has expired"
+  // verbatim while ignoring the caller's "no"). Prompt rules alone don't
+  // reliably stop this, so force a graceful exit instead of repeating again.
+  const lastAssistant = [...s.messages].reverse().find(m => m.role === 'assistant');
+  const terminalActions = ['goodbye', 'transfer', 'save_request', 'voicemail'];
+  if (lastAssistant && !terminalActions.includes(ai.action) &&
+      normalizeForCompare(ai.speech) === normalizeForCompare(lastAssistant.content)) {
+    console.log(`[LOOP BREAK] Repeated response detected — forcing goodbye`);
+    ai.action = 'goodbye';
+    ai.speech = "I want to make sure this gets handled properly — I'll have our team follow up with you directly. Have a great day!";
+    ai.summary = ai.summary || s.reason || s.intent || 'Call ended — AI got stuck repeating itself';
+  }
 
   // Update session from AI
   if (ai.extracted?.name && !s.name) s.name = ai.extracted.name;
