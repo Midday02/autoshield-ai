@@ -43,8 +43,12 @@ function normalizeSpeech(text) {
     zero:'0',one:'1',two:'2',three:'3',four:'4',
     five:'5',six:'6',seven:'7',eight:'8',nine:'9',oh:'0',nought:'0'
   };
+  // Strip punctuation Twilio inserts for pauses between spoken digits/letters
+  // (e.g. "W. 1 0 0, 0 0 1.") — every regex below assumes only letters,
+  // digits, and single spaces, so a stray period or comma breaks the chain.
+  let s = text.replace(/[.,]/g, '');
   // Fix char-by-char transcription: "m e d i u m" -> "medium"
-  let s = text.replace(/\b([a-zA-Z0-9])\s(?=[a-zA-Z0-9](?:\s|$))/g, '$1').trim();
+  s = s.replace(/\b([a-zA-Z0-9])\s(?=[a-zA-Z0-9](?:\s|$))/g, '$1').trim();
   // Convert spoken numbers and "double you"
   s = s
     .replace(/\bdouble\s+you\b/gi, 'W')
@@ -92,6 +96,9 @@ export async function handleIncomingCall(req, res) {
   const callSid = req.body.CallSid;
   const from = req.body.From || 'Unknown';
   const s = newSession(callSid, from);
+  // The greeting below always plays here, regardless of how identification
+  // later goes — mark it said now so the AI never repeats it on its first turn.
+  s.greetedOnce = true;
   sessions.set(callSid, s);
   sessionsByPhone.set(from, s);
   console.log(`[CALL] Incoming: ${callSid} from ${from}`);
@@ -409,6 +416,7 @@ async function safeLogRequest(s, summary) {
   try {
     const dept = s.intent === 'Claim' ? 'Claims' :
                  s.intent === 'New Policy' ? 'Sales' :
+                 s.intent === 'Renewal' ? 'Sales' :
                  s.intent === 'Billing' ? 'Accounting' :
                  s.intent === 'Escalation' ? 'Management' :
                  (s.routedTo || '').split('·')[0].trim() || 'General';
@@ -520,6 +528,8 @@ RULES:
 9. Keep responses 2-4 sentences. Coverage/plan questions: up to 6 sentences.
 10. NEVER invent plan names — only plans from ALL PLANS list
 11. NEVER ask about vehicle issue, symptoms, mileage, or "what's wrong with the car" unless Intent is Claim. For Sales, Billing, Renewal, Escalation, or unknown intent — figure out what the caller needs first; do not default to claim-style questions.
+12. NEVER say a request/ticket/callback has been "saved" or "logged" unless action in THIS SAME response is save_request, transfer, or goodbye — those are the only actions that actually persist anything. If action is collect_more, do not claim anything was saved yet.
+13. The moment the caller explicitly asks to leave a message, get a callback, create a ticket, or speak to a live/human agent — that turn's action must be save_request (or transfer, if business hours and a clear department fits), never collect_more. Do not ask further clarifying questions first.
 
 CLAIM FLOW (only when intent=Claim — do not use this flow or its questions for any other intent):
 - Collect one field at a time: issue → when_started → mileage → at_shop → symptoms
