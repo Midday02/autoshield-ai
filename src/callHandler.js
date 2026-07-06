@@ -24,7 +24,6 @@ function gather(r, callSid, sayText) {
     timeout: 12,
   });
   g.say({ voice: 'Polly.Matthew', language: 'en-US' }, sayText);
-  r.redirect(`/voice/speech?callSid=${callSid}&fallback=1`);
 }
 
 function normalizeSpeech(text) {
