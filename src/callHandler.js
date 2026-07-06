@@ -146,6 +146,7 @@ export async function handleUserSpeech(req, res) {
   if (s.identified && !s.verified) {
     if (matchesName(rawSpeech, s.pendingCustomerName)) {
       s.verified = true;
+      s.name = s.pendingCustomerName;
       s.vehicle = s.pendingVehicle;
       s.planType = s.pendingPlanType;
       s.stage = 'greet';
@@ -311,7 +312,7 @@ export async function handleUserSpeech(req, res) {
       s.routedTo = 'After Hours — Request Saved';
       sessions.set(callSid, s);
       await safeLogCall(s);
-      await safeLogRequest(s, ai.summary || s.reason || '');
+      await safeLogRequest(s, ai.summary || s.reason || '', ai.department);
       r.say({ voice: 'Polly.Matthew' }, `I have saved your request and someone will follow up next business day. Have a great day!`);
       r.hangup();
     } else {
@@ -321,14 +322,14 @@ export async function handleUserSpeech(req, res) {
         s.routedTo = `${dept?.name || 'Team'} — Request Saved`;
         sessions.set(callSid, s);
         await safeLogCall(s);
-        await safeLogRequest(s, ai.summary || s.reason || '');
+        await safeLogRequest(s, ai.summary || s.reason || '', dept?.name);
         r.say({ voice: 'Polly.Matthew' }, `I have logged your request for the ${dept?.name || 'team'} and they will call you back. Have a great day!`);
         r.hangup();
       } else {
         s.routedTo = `${dept.name} · Ext. ${ai.extension}`;
         sessions.set(callSid, s);
         await safeLogCall(s);
-        await safeLogRequest(s, ai.summary || s.reason || '');
+        await safeLogRequest(s, ai.summary || s.reason || '', dept.name);
         r.say({ voice: 'Polly.Matthew' }, ai.speech);
         const dial = r.dial({ timeout: 20, action: `/voice/recording?callSid=${callSid}` });
         dial.number(dept.phoneNumber);
@@ -339,7 +340,7 @@ export async function handleUserSpeech(req, res) {
     s.routedTo = s.routedTo || `${ai.department || 'General'} — Request Saved`;
     sessions.set(callSid, s);
     await safeLogCall(s);
-    await safeLogRequest(s, ai.summary || s.reason || '');
+    await safeLogRequest(s, ai.summary || s.reason || '', ai.department);
     r.say({ voice: 'Polly.Matthew' }, ai.speech);
     r.hangup();
 
@@ -347,7 +348,7 @@ export async function handleUserSpeech(req, res) {
     s.routedTo = `Voicemail · ${ai.department || 'General'}`;
     sessions.set(callSid, s);
     await safeLogCall(s);
-    await safeLogRequest(s, ai.summary || s.reason || '');
+    await safeLogRequest(s, ai.summary || s.reason || '', ai.department);
     r.say({ voice: 'Polly.Matthew' }, ai.speech);
     r.record({ action: `/voice/recording?callSid=${callSid}`, maxLength: 120, playBeep: true });
 
@@ -412,14 +413,15 @@ async function safeLogCall(s) {
   }
 }
 
-async function safeLogRequest(s, summary) {
+async function safeLogRequest(s, summary, department) {
   try {
-    const dept = s.intent === 'Claim' ? 'Claims' :
-                 s.intent === 'New Policy' ? 'Sales' :
-                 s.intent === 'Renewal' ? 'Sales' :
-                 s.intent === 'Billing' ? 'Accounting' :
-                 s.intent === 'Escalation' ? 'Management' :
-                 (s.routedTo || '').split('·')[0].trim() || 'General';
+    const dept = department ||
+                 (s.intent === 'Claim' ? 'Claims' :
+                  s.intent === 'New Policy' ? 'Sales' :
+                  s.intent === 'Renewal' ? 'Sales' :
+                  s.intent === 'Billing' ? 'Accounting' :
+                  s.intent === 'Escalation' ? 'Management' :
+                  'General');
     await logRequestToSheets({
       timestamp: new Date().toISOString(),
       type: s.intent || 'Other',
